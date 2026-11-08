@@ -62,6 +62,10 @@ def process_mass_balance_diagnostics(sys):
         'process_mass_balance_error_pct': (
             (outlet - inlet) / inlet * 100.0 if inlet else np.nan
         ),
+        # Backward-compatible sign convention: positive means apparent mass loss.
+        'mass_balance_pct': (
+            (inlet - outlet) / inlet * 100.0 if inlet else np.nan
+        ),
         'catalyst_makeup_kg_hr_excluded': catalyst_makeup,
     }
 
