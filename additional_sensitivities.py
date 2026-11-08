@@ -6,6 +6,7 @@ prices use the same tax, delivery, date and location basis before interpreting
 the gap as a policy support requirement.
 """
 import argparse
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -22,7 +23,7 @@ def price_parity_screen(mjsp_inr_l, fossil_atf_inr_l):
     """Return a simple price gap; positive means SAF MJSP exceeds the ATF benchmark."""
     mjsp = float(mjsp_inr_l)
     benchmark = float(fossil_atf_inr_l)
-    if mjsp < 0 or benchmark <= 0:
+    if not math.isfinite(mjsp) or not math.isfinite(benchmark) or mjsp < 0 or benchmark <= 0:
         raise ValueError("MJSP must be non-negative and fossil ATF benchmark must be positive")
     return {
         "SAF_MJSP_INR_L": mjsp,
@@ -42,7 +43,7 @@ def main():
         help="Hydrogen storage inventory durations to test (days)",
     )
     args = parser.parse_args()
-    if not args.storage_days or any(x <= 0 for x in args.storage_days):
+    if not args.storage_days or any(not math.isfinite(x) or x <= 0 for x in args.storage_days):
         parser.error("--storage-days must contain positive values")
 
     out = Path(args.out)
