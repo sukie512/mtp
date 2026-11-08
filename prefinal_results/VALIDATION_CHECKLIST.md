@@ -7,7 +7,8 @@ This register separates implemented corrections from unresolved evidence/model w
 - [x] All primary and supplementary analysis scripts now write to `prefinal_results/` by default.
 - [x] CI uses Python 3.12, matching the current ThermoSTEAM dependency's Python requirement.
 - [x] Duplicate GitHub Actions workflow removed.
-- [x] 2G cellulosic ethanol no longer receives the generic conventional-route transport adder. Its quoted INR 160/L input remains a production-cost proxy; 2G delivery/storage is excluded, not assumed free.
+- [x] 2G cellulosic ethanol no longer receives the generic conventional-route transport adder. The provisional baseline was refreshed from INR 160/L to INR 120/L using 2026 industry commentary; the older INR 160/L estimate is retained as a high-cost comparison case. Neither is a project-specific offtake quote; 2G delivery/storage remains excluded, not assumed free.
+- [x] Added an ethanol price-basis audit and per-litre SAF operating-cost diagnostics to separate ethanol feed contribution, hydrogen, co-product credits, operating costs and the simulated ethanol-to-SAF volume ratio.
 - [x] Ethanol purchase price is converted to a per-kg total ethanol-water feed price using the configured ethanol mass fraction, so the water fraction is not charged as pure ethanol.
 - [x] New tests cover the 2G/conventional transport distinction and the total-feed pricing basis.
 - [x] Main Monte Carlo runner now writes failed/non-finite samples to `monte_carlo_failed_samples.csv` and records requested/valid/failed counts and MJSP percentiles in `run_manifest.json`.
@@ -18,7 +19,7 @@ This register separates implemented corrections from unresolved evidence/model w
 |---|---|---|
 | India location factor (0.90) | Unresolved assumption; scales FCI | Obtain India-vs-US installed-cost factor from a traceable cost database or EPC estimate; document plant location, battery limits and year |
 | Labour cost (USD 1.2M/y) | Unresolved placeholder | Obtain a defensible staffing plan for this plant; combine with NIC-20 chemical-industry ASI emoluments/person data and state/plant-specific allowances. Do not use an all-industry wage average |
-| 2G ethanol cost (INR 160/L) | Production-cost proxy | Obtain a project-specific ex-plant/offtake quote and logistics/storage to the ATJ site. Current 2G delivery cost is excluded |
+| 2G ethanol cost (INR 120/L baseline; INR 160/L high case) | Indicative industry production-cost estimates; not administered prices or project quotes | Obtain a project-specific ex-plant cost build-up/offtake quote and logistics/storage to the ATJ site. Current 2G delivery cost is excluded. The 1G SAF selling-price target of INR 180–200/L must not be used as a direct validation target for this 2G route without aligning ethanol price, integration, yields and plant boundary |
 | Green off-site H2 (INR 363/kg) | Refinery-gate price anchor | Add transport, compression/loading, delivery, unloading and inventory losses/costs for the actual plant location |
 | Green on-site H2 | Excluded from route comparison | Build electrolyser, renewable electricity/PPA, water treatment, compression/storage, stack replacement and utilization CAPEX/OPEX |
 | Blue H2 | Excluded from route comparison | Build SMR + capture rate + CO2 conditioning/transport/storage + residual emissions and costs |
@@ -41,19 +42,21 @@ This register separates implemented corrections from unresolved evidence/model w
 
 1. Create/use a Python 3.12 environment and install `requirements.txt`.
 2. Run syntax compilation and the full unit-test suite.
-3. Run the deterministic + 3,000-sample analysis to `prefinal_results/`.
-4. Run the hydrogen storage sensitivity and price-parity screen to the same folder.
-5. Run at least three independent 1,000-sample LHS replicates into `prefinal_results/replicates/`; compare P5/P50/P95 and failure fractions. If they disagree materially, increase sample count and investigate.
-6. Review `sweep_failures.csv`, `monte_carlo_failed_samples.csv`, `monte_carlo_convergence.csv`, `mc_replicate_summary.csv`, `unit_energy_diagnostics.csv`, and process/element balance diagnostics.
-7. Check the run manifest's Git revision, Python/package versions, seed and valid sample count. Never mix outputs from different revisions.
-8. Preserve this checklist with the figures and CSVs. A successful test suite or converged simulation does not validate unresolved process assumptions or cost correlations.
+3. Run the deterministic + 3,000-sample analysis to `prefinal_results/`; review the new per-litre operating-cost breakdown columns.
+4. Run `ethanol_price_basis_audit.py` and compare the 1G reference, 2G INR 120/L provisional case and 2G INR 160/L high case.
+5. Run the hydrogen storage sensitivity and price-parity screen to the same folder.
+6. Run at least three independent 1,000-sample LHS replicates into `prefinal_results/replicates/`; compare P5/P50/P95 and failure fractions. If they disagree materially, increase sample count and investigate.
+7. Review `sweep_failures.csv`, `monte_carlo_failed_samples.csv`, `monte_carlo_convergence.csv`, `mc_replicate_summary.csv`, `unit_energy_diagnostics.csv`, and process/element balance diagnostics.
+8. Check the run manifest's Git revision, Python/package versions, seed and valid sample count. Never mix outputs from different revisions.
+9. Preserve this checklist with the figures and CSVs. A successful test suite or converged simulation does not validate unresolved process assumptions or cost correlations.
 
 ## Commands
 
 ```powershell
-python -m py_compile run_all.py additional_sensitivities.py run_mc_replicates.py
+python -m py_compile run_all.py additional_sensitivities.py run_mc_replicates.py ethanol_price_basis_audit.py
 pytest -q
 python run_all.py --n 3000 --seed 1234 --no-show --out prefinal_results
 python additional_sensitivities.py --out prefinal_results
+python ethanol_price_basis_audit.py --out prefinal_results/ethanol_price_basis_audit.csv
 python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out prefinal_results/replicates
 ```
