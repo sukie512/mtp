@@ -111,7 +111,7 @@ The runner writes files under new_results/ by default:
 - Monte Carlo sample table when the full uncertainty run is enabled
 - Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This is an empirical diagnostic using subsets of one LHS design, not independent replicated LHS convergence proof.
 
-The runner reports the number of converged Monte Carlo samples and MJSP percentiles. Check that count before interpreting the distribution; failed samples are excluded from the reported percentile calculation. Preserve the terminal log with the output folder so the run can be reproduced and reviewed.
+The runner reports the number of converged Monte Carlo samples and MJSP percentiles. The baseline balance metrics are process-only: catalyst make-up is reported separately because spent catalyst is not yet modelled as an outlet. Check that count before interpreting the distribution; failed samples are excluded from the reported percentile calculation. Preserve the terminal log with the output folder so the run can be reproduced and reviewed.
 
 ## ASF selectivity basis
 
@@ -139,7 +139,7 @@ Run the tests locally from the repository root:
 pytest -q
 ```
 
-These tests cover ASF distribution normalization, the oligomer-product basis, the C8+ calibration target, the C8–C16 bound check, WDV depreciation and residual value, Monte Carlo setter propagation, coupled reactor/heater/compressor settings, total feed-volume conversion, elemental-balance diagnostics, and unit-level energy diagnostics. They do not replace a full BioSTEAM integration test or validation against experimental plant data.
+These tests cover ASF distribution normalization, the oligomer-product basis, the C8+ calibration target, the C8–C16 bound check, WDV depreciation and residual value, Monte Carlo setter propagation, coupled reactor/heater/compressor settings, total feed-volume conversion, elemental-balance diagnostics, catalyst make-up exclusion from process-only balances, and unit-level energy diagnostics. They do not replace a full BioSTEAM integration test or validation against experimental plant data.
 
 ## Important limitations before using results in a thesis
 
