@@ -32,6 +32,8 @@ This register separates implemented corrections from unresolved evidence/model w
 | Heat integration and utilities | Simplified heat/power duties; no full integration network | Add heat recovery, steam/boiler-turbogenerator and cooling utility design; validate steam balance and net purchased electricity |
 | Wastewater treatment | Per-kg wastewater cost proxy | Define wastewater composition, flow, treatment train, discharge standard, sludge and CAPEX/OPEX; reconcile with process utility boundary |
 | Catalyst waste/regeneration | Catalyst makeup costed; spent catalyst outlet absent | Add spent-catalyst flow, regeneration/recovery, disposal and replacement logistics; current process balance is not whole-plant closure |
+| FX conversion | Refreshed to ₹94.1402/USD using the RBI/FBIL reference rate for 6 Nov 2026 | Refresh to the reference rate on the actual run date; retain the dated value in the manifest/input record |
+| Fossil ATF benchmark | Refreshed to about ₹138.50/L for Delhi, effective 1 Nov 2026 | Verify against the direct IOCL monthly notification and reconcile airport charges, tax and delivery basis with plant-gate SAF MJSP |
 | Co-product prices | Naphtha/diesel anchors have different source dates and tax bases | Refresh plant-gate realizable netback prices, quality/specification, transport, tax and sales basis |
 | Correlated prices | Most price distributions sampled independently | Add correlations only when supported by paired historical data or a defensible common-driver model; do not invent coefficients |
 
