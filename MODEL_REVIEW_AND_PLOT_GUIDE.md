@@ -41,7 +41,7 @@ The `.xlsm` literature/input workbook is not read or modified by the plotting ch
 ### 2. Runner robustness
 
 - Removed global warning suppression so important BioSTEAM, numerical and thermodynamic warnings remain visible.
-- Corrected the fallback sweep logic so it does not re-run the baseline simulation for every failed sweep point merely to discover the output columns.
+- Corrected fallback sweep logic so it does not re-run the baseline for every failed point merely to discover output columns; it also retries individual operating points when a combined sweep returns non-finite headline metrics.
 - Replaced runtime source-code rewriting for importing `uncertainty.py` with normal imports; the uncertainty module now supports both package and flat-folder execution.
 
 ### 3. ASF distribution tail
