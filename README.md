@@ -102,6 +102,16 @@ python run_all.py --n 3000 --no-show --out results_3000
 
 Do not use --quick when the objective is to run the uncertainty analysis.
 
+### Independent LHS replicate check
+
+The prefix-based diagnostic above uses subsets of one LHS design. For a stronger check, run multiple independent designs with distinct seeds:
+
+```bash
+python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out new_results/replicates
+```
+
+This performs three fresh 1,000-sample runs, saves each replicate's sample table, and writes `mc_replicate_summary.csv` with valid/failed counts, mean, standard deviation and P5/P50/P95 MJSP. Compare the replicate quantiles and failure fractions; large differences indicate that the uncertainty estimates are not yet stable. This is a diagnostic, not a guarantee of convergence.
+
 ## Outputs
 
 The runner writes files under new_results/ by default:
@@ -109,7 +119,8 @@ The runner writes files under new_results/ by default:
 - PNG and PDF versions of the generated figures
 - CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps
 - Monte Carlo sample table when the full uncertainty run is enabled
-- Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This is an empirical diagnostic using subsets of one LHS design, not independent replicated LHS convergence proof.
+- Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This uses subsets of one LHS design, not independent replicated LHS convergence proof.
+- Optional independent replicate outputs from `run_mc_replicates.py`, including each sample table and a cross-replicate quantile summary.
 
 The runner reports the number of converged Monte Carlo samples and MJSP percentiles. The baseline balance metrics are process-only: catalyst make-up is reported separately because spent catalyst is not yet modelled as an outlet. Check that count before interpreting the distribution; failed samples are excluded from the reported percentile calculation. A `run_manifest.json` is also written with the command, seed, Git revision (when available), Python/platform details, dependency versions and baseline inputs/results. Preserve it with the CSVs and figures.
 
