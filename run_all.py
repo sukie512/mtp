@@ -82,7 +82,8 @@ def save(fig, name):
             fig.savefig(png, dpi=300, facecolor='white', bbox_inches='tight')
             fig.savefig(pdf, format='pdf', facecolor='white', bbox_inches='tight')
             print(f'   [charts saved: results/{os.path.basename(png)} and {os.path.basename(pdf)}]', flush=True)
-            plt.close(fig)
+            if args.no_show:
+                plt.close(fig)
             return
         except OSError as e:
             print(f'   !! could not save {stem} ({e}); retrying with a fresh filename', flush=True)
