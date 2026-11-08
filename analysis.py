@@ -88,7 +88,7 @@ def sweep_ethanol_route():
 
 def sweep_h2_route():
     rows = []
-    for r in cfg.S['h2_INR_kg']:
+    for r in cfg.S.get('h2_comparison_routes', tuple(cfg.S['h2_INR_kg'])):
         rows.append(dict(route=r, **results(*run(h2_route=r))))
     return pd.DataFrame(rows)
 
