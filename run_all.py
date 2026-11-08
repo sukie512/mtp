@@ -1,6 +1,6 @@
 """
 run_all.py  --  RUN THIS FILE.  It calls the model files, prints every result table in the terminal,
-saves every chart as a PNG in ./results/ and (unless --no-show) opens all charts at the end.
+saves every chart as PNG and PDF in the selected output folder (default: ./new_results/) and (unless --no-show) opens charts at the end.
 
     python run_all.py              # 3000 Latin-hypercube samples (full analysis)
     python run_all.py --n 3000    # explicitly set the Monte Carlo sample count
@@ -82,7 +82,7 @@ def save(fig, name):
         try:
             fig.savefig(png, dpi=300, facecolor='white', bbox_inches='tight')
             fig.savefig(pdf, format='pdf', facecolor='white', bbox_inches='tight')
-            print(f'   [charts saved: results/{os.path.basename(png)} and {os.path.basename(pdf)}]', flush=True)
+            print(f'   [charts saved: {os.path.relpath(png, HERE)} and {os.path.relpath(pdf, HERE)}]', flush=True)
             if args.no_show:
                 plt.close(fig)
             return
