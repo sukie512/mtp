@@ -42,9 +42,9 @@ S = dict(
     ethanol_route='2G_cellulosic',  # thesis baseline: lignocellulosic (2G) ethanol; 1G routes remain comparison cases
     ethanol_exmill_INR_L={'C_heavy': 57.97, 'B_heavy': 60.73, 'cane_juice': 65.61,
                           'FCI_rice': 60.32, 'damaged_grain': 64.00, 'maize': 71.86,
-                          '2G_cellulosic': 160.0},  # 2G: [VERIFIED-26 as a cost, not an administered price] industry executive quoted ~Rs 160/L production cost (autocarpro.in/NEWS/can-india-overcome-the-economic-challenges-of-higher-generation-ethanol-123309); OMCs set 2G prices case by case (PIB PRID=1770518)
+                          '2G_cellulosic': 120.0},  # 2G: provisional production-cost estimate from 2026 industry commentary (iamrenew.com, 2026: ~Rs 120/L vs ~Rs 70/L for 1G). NOT an administered price or verified project quote. Retain Rs 160/L as an explicit high-cost case in ethanol_price_basis_audit.py; older 2024 executive quote (Autocar Professional) reported ~Rs 160/L. OMC 2G procurement is case-specific.
     ethanol_transport_INR_L_conventional=1.2,  # DERIVED conventional-route proxy: delivered IOCL price less ex-mill + assumed creditable GST; not a 2G logistics estimate.
-    #   2G_cellulosic is a quoted production-cost proxy, not an administered ex-mill price. Its separate
+    #   2G_cellulosic is a provisional industry production-cost estimate, not an administered ex-mill price. Its separate
     #   delivery/storage cost is unknown, so the generic conventional-route adder is NOT applied to 2G.
     #   This avoids adding an unsupported Rs 1.2/L to the 2G cost, but does NOT mean 2G delivery is free:
     #   the current 2G feed-price boundary is production-cost proxy with logistics unresolved/excluded.
