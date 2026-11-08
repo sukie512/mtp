@@ -94,7 +94,7 @@ def table(df, name, cols=None):
     print(d.round(4).to_string(index=False)); d.to_csv(_free_path(name, '.csv'), index=False)
 
 # ------------------------------------------------------------------ 1 baseline
-head(f"1. BASELINE: {s_['ethanol_KLPD']:.0f} KLPD {s_['ethanol_route']} ethanol, {s_['h2_route']} hydrogen, Indian finance")
+head(f"1. BASELINE: {cfg.S['ethanol_KLPD']:.0f} KLPD {cfg.S['ethanol_route']} ethanol, {cfg.S['h2_route']} hydrogen, Indian finance")
 sys_, tea_, F_, s_ = A.run(); base = A.results(sys_, tea_, F_, s_)
 print(pd.Series(base).round(3).to_string())
 energy_diag = A.unit_energy_diagnostics(sys_)
