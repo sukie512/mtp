@@ -132,6 +132,7 @@ The runner writes files under prefinal_results/ by default:
 - PNG and PDF versions of the generated figures
 - CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps, plus `sweep_failures.csv` with exception details for any points that required fallback or failed
 - Monte Carlo sample table when the full uncertainty run is enabled
+- `monte_carlo_failed_samples.csv` for failed or non-finite samples; the run manifest records requested, valid and failed counts plus MJSP percentiles
 - Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This uses subsets of one LHS design, not independent replicated LHS convergence proof.
 - Optional independent replicate outputs from `run_mc_replicates.py`, including each sample table and a cross-replicate quantile summary.
 
@@ -179,4 +180,4 @@ These tests cover ASF distribution normalization, the oligomer-product basis, th
 10. **Independent validation:** complete carbon, hydrogen and oxygen balances, stream mass balances, energy-duty checks, unit checks and selected comparisons against literature or independently calculated values.
 10. **Runtime status:** a successful BioSTEAM simulation is not, by itself, process validation. Do not report new numerical results as verified until the current branch has been run locally and its logs, warnings, convergence and balances have been reviewed.
 
-For the complete issue-by-issue checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md).
+For the complete issue-by-issue checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md) and [prefinal validation register](prefinal_results/VALIDATION_CHECKLIST.md).
