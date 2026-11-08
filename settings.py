@@ -60,6 +60,7 @@ S = dict(
     #  green_onsite 363 and blue_smr_ccs 260 = [UNRESOLVED] no India source found; green_onsite needs an electrolyser capex + solar/wind PPA
     #     calculation (solar bids reach ~Rs 2/kWh per hydrogenfuelnews.com), blue needs a CCS cost; both are copies/placeholders, do not report them.
     h2_INR_kg={'green_offsite': 363.0, 'green_onsite': 363.0, 'grey_smr_refinery': 200.0, 'blue_smr_ccs': 260.0},
+    h2_comparison_routes=('green_offsite', 'grey_smr_refinery'),  # exclude onsite/blue until full production and delivery costs are modelled
     h2_storage_days=7,            # [REPO]
     h2_ratio=3.0,                 # mol H2 : mol olefin at hydrogenator inlet [REPO]
     h2_recovery=0.85,             # PSA recovery [REPO]
