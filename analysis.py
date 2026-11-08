@@ -13,13 +13,12 @@ except ImportError:
     import settings as cfg
     from system import build
 
-warnings.filterwarnings('ignore')
 _n = itertools.count(1)
 GAL = 264.172        # gal per m3
 
 def run(s=None, **overrides):
     """Build + simulate. overrides use dotted keys, e.g. run(**{'olig.T': 403.15, 'ethanol_route': 'maize'})."""
-    s = s or cfg.get()
+    s = copy.deepcopy(s) if s is not None else cfg.get()
     for k, v in overrides.items():
         if '.' in k:
             a, b = k.split('.'); s[a][b] = v
