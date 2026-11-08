@@ -36,7 +36,7 @@ plt.rcParams.update({
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, args.out); os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, HERE)
 import settings as cfg, analysis as A
-from asf_model import weight_fractions, alpha_from_T_P, calibrate_beta0
+from asf_model import oligomer_weight_fractions, alpha_from_T_P, calibrate_beta0
 
 import uncertainty as U
 
@@ -139,22 +139,22 @@ plt.setp(ax[1].get_xticklabels(), rotation=35, ha='right'); fig.set_size_inches(
 # ------------------------------------------------------------------ 3 ASF
 head('3. OLIGOMERIZATION MODEL: product distribution from Anderson-Schulz-Flory chain growth')
 a_ref, b0 = calibrate_beta0(0.63); dE = s_['olig']['dE']
-w0 = weight_fractions(a_ref)
+w0 = oligomer_weight_fractions(a_ref)
 print(f'alpha at 393 K / 35 bar = {a_ref:.3f} (calibrated so C8+ = 63 wt%, Heveling 1998)')
 print('Model  C4-C6 / C8-C16 / C18+ [wt%]:', [round(x * 100, 1) for x in (w0[1:3].sum(), w0[3:8].sum(), w0[8:].sum())])
 print('Paper  C4-C6 / C8-C16 / C18+ [wt%]: [34, 63, 3]  (paper hard-codes this; ASF cannot match it exactly)')
 fig, ax = plt.subplots(1, 2, figsize=(13, 4.2)); ks = np.arange(1, 13)
 for T, c in [(373.15, '#457b9d'), (393.15, '#2a9d8f'), (413.15, '#e76f51')]:
-    al = alpha_from_T_P(T, 35, b0, dE); ax[0].plot(2 * ks, weight_fractions(al)[:12] * 100, 'o-', color=c, label=f'{T - 273.15:.0f} C, alpha={al:.2f}')
+    al = alpha_from_T_P(T, 35, b0, dE); ax[0].plot(2 * ks, oligomer_weight_fractions(al)[:12] * 100, 'o-', color=c, label=f'{T - 273.15:.0f} C, alpha={al:.2f}')
 ax[0].axvspan(3.5, 6.5, color='#e9c46a', alpha=.22, label='Renewable naphtha range')
 ax[0].axvspan(7.5, 16.5, color='#2a9d8f', alpha=.12, label='SAF carbon-number range')
 ax[0].axvspan(17.5, 25, color='#e76f51', alpha=.10, label='Diesel-range products')
-ax[0].set_xlabel('Product carbon number (C-number)'); ax[0].set_ylabel('Mass fraction of converted ethylene (wt%)')
+ax[0].set_xlabel('Product carbon number (C-number)'); ax[0].set_ylabel('Mass fraction of oligomer products (wt%)')
 ax[0].set_title('ASF Product Distribution at 35 bar')
 ax[0].legend(title='Temperature and product range', frameon=False, fontsize=8)
 Tg = np.linspace(363, 423, 40)
-for P in (25, 35, 45): ax[1].plot(Tg - 273.15, [weight_fractions(alpha_from_T_P(T, P, b0, dE))[3:8].sum() * 100 for T in Tg], label=f'{P} bar')
-ax[1].set_xlabel('Oligomerization temperature (°C)'); ax[1].set_ylabel('C8–C16 selectivity (wt% of converted ethylene)')
+for P in (25, 35, 45): ax[1].plot(Tg - 273.15, [oligomer_weight_fractions(alpha_from_T_P(T, P, b0, dE))[3:8].sum() * 100 for T in Tg], label=f'{P} bar')
+ax[1].set_xlabel('Oligomerization temperature (°C)'); ax[1].set_ylabel('C8–C16 selectivity (wt% of oligomer products)')
 ax[1].set_title('Modelled SAF-Range Selectivity vs Temperature')
 ax[1].legend(title='Oligomerization pressure', frameon=False)
 fig.text(0.01, 0.005, 'Exploratory model output: temperature sensitivity depends on the assumed activation-energy difference (dE).', fontsize=9, color='#555555')
