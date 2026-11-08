@@ -65,7 +65,7 @@ These are not cosmetic issues. They can change the reported MJSP, selectivity or
 7. **Equipment cost correlations:** the pressure-vessel correlation in `units.py` is explicitly marked as requiring verification against the cited source. Verify vessel sizing, design pressure, wall thickness, material, CEPCI basis and purchase/installed-cost treatment before treating FCI as final.
 8. **Capacity basis:** KLPD is treated as total ethanol-water feed volume. The mass-flow helper now estimates mixture density from ethanol/water mass fractions using additive specific volumes. This is an approximation; validate it against a rigorous mixture-density calculation before treating capacity as final.
 9. **Uncertainty distributions and convergence:** several bounds are judgement-based or marked unresolved in the source comments. Keep them as scenario ranges, not empirical confidence intervals, until supported by traceable data. The runner now saves a prefix-based percentile stability diagnostic from the same LHS design; this is useful as a quick stability check but is not a substitute for independent replicated LHS runs at increasing sample counts.
-10. **Monte Carlo pressure coupling (corrected):** a sampled oligomerization pressure now updates K202 compressor discharge, D202 ethylene-purification column pressure, and R202 reactor pressure together. Updating only the compressor and reactor would leave the intervening column at its baseline pressure. The unit test asserts all three values change together.
+10. **Monte Carlo pressure coupling (corrected):** a sampled oligomerization pressure updates K202 compressor discharge, D202 ethylene-purification column pressure, and R202 reactor pressure together. The earlier review statement that only K202/R202 moved is stale; the current setter and unit test cover all three.
 11. **Independent LHS replicates:** `run_mc_replicates.py` runs fresh models with distinct seeds and compares MJSP quantiles and failure fractions across independent designs. This is stronger than the prefix diagnostic in `run_all.py`, which reuses one design. It still does not validate the chosen distributions or the underlying process model.
 12. **Catalyst balance boundary:** catalyst make-up streams are costed as external feeds, but spent catalyst discharge is not modelled. `analysis.py` excludes `Cat_dehyd`, `Cat_olig` and `Cat_hydgn` from process-only mass and C/H/O balances, and reports their combined flow as `catalyst_makeup_kg_hr_excluded`. This avoids counting catalyst replacement as an unexplained process loss, but it is not a complete plant-wide material balance. Add spent-catalyst outlets and disposal/regeneration treatment before claiming whole-plant closure.\n13. **Independent validation:** `analysis.results()` reports process-only C/H/O and mass-balance diagnostics. `run_all.py` also exports each unit's net heat duty and power demand to `unit_energy_diagnostics.csv`. These are diagnostics, not proof of unit-level correctness. Still inspect unit-level reaction balances, energy duties, equipment sizing and selected hand calculations/literature comparisons. A successful BioSTEAM simulation alone does not validate the process model.\n14. **Run reproducibility:** `run_all.py` accepts an explicit `--seed` and writes `run_manifest.json` with the command, seed, Git revision (when available), Python/platform details, package versions and baseline inputs/results. `requirements.txt` centralizes dependencies; GitHub Actions runs the unit tests on the thesis branch.
 
@@ -90,3 +90,23 @@ The figures are written to `new_results/` by default as high-resolution PNG and 
 ## Validation status
 
 This branch contains static code changes only. The BioSTEAM flowsheet and full Monte Carlo run have not been executed in this review environment. Therefore no new numerical result, MJSP, selectivity value or plot is represented as runtime-verified. Run the commands above locally and inspect solver warnings, convergence counts and mass/element balances before using the figures in a defence or presentation.
+
+
+## Supplementary sensitivity and policy screens
+
+The script `additional_sensitivities.py` adds two small analyses outside the main Monte Carlo runner:
+
+- **Hydrogen storage duration:** rebuilds and simulates the plant at 1, 3, 7, 14 and 30 days of H2 inventory. It reports the H2 tank installed cost, total installed equipment cost, FCI and MJSP. In the present flowsheet, storage days change the tank sizing/capital correlation; they do not model dynamic inventory, delivery outages, truck scheduling or reliability.
+- **SAF/fossil ATF price parity:** reports the arithmetic difference and ratio between deterministic SAF MJSP and the configured fossil ATF benchmark. This is a screening calculation only, not a subsidy estimate or full policy model. The benchmark's tax, delivery, date and location basis must be reconciled with the plant-gate SAF MJSP before drawing conclusions.
+
+Run from the repository root:
+
+```powershell
+python additional_sensitivities.py --out new_results
+```
+
+The pressure-coupling test already exists and confirms that K202, D202 and R202 move together. It should not be re-implemented.
+
+Catalyst deactivation rate/cycle length and catalyst replacement lifetime remain distinct: the current model applies cycle-average activity decay over a run interval while catalyst lifetime determines make-up/replacement cost. This can represent repeated operating/regeneration cycles before eventual replacement, but regeneration recovery, regeneration cost and catalyst-life evidence are not currently modelled. Do not force equality between cycle length and catalyst life without catalyst-specific operating evidence.
+
+The hydrogen-price uncertainty input is explicitly labelled refinery-gate price with delivery excluded. The 77–127% distribution is a scenario range around that gate price; it is not a sourced transport-cost model.
