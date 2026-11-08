@@ -37,16 +37,7 @@ sys.path.insert(0, HERE)
 import settings as cfg, analysis as A
 from asf_model import weight_fractions, alpha_from_T_P, calibrate_beta0
 
-def load_uncertainty():
-    """uncertainty.py uses package-style imports (from .system import ...), which fail when files sit in one flat
-    folder. Instead of editing your file, load it here with those 3 import lines pointed at the flat modules."""
-    import types
-    src = open(os.path.join(HERE, 'uncertainty.py'), encoding='utf-8').read()
-    src = (src.replace('from .system import', 'from system import').replace('from . import settings as cfg', 'import settings as cfg')
-              .replace('from .analysis import', 'from analysis import'))
-    mod = types.ModuleType('uncertainty'); mod.__file__ = os.path.join(HERE, 'uncertainty.py')
-    exec(compile(src, mod.__file__, 'exec'), mod.__dict__); return mod
-U = load_uncertainty()
+import uncertainty as U
 
 def safe(sweep_fn, fallback_rows, label):
     """Call YOUR sweep function. If one operating point crashes the BioSTEAM column solver (e.g. 373 K / 45 bar in
@@ -151,10 +142,12 @@ print('Paper  C4-C6 / C8-C16 / C18+ [wt%]: [34, 63, 3]  (paper hard-codes this; 
 fig, ax = plt.subplots(1, 2, figsize=(13, 4.2)); ks = np.arange(1, 13)
 for T, c in [(373.15, '#457b9d'), (393.15, '#2a9d8f'), (413.15, '#e76f51')]:
     al = alpha_from_T_P(T, 35, b0, dE); ax[0].plot(2 * ks, weight_fractions(al)[:12] * 100, 'o-', color=c, label=f'{T - 273.15:.0f} C, alpha={al:.2f}')
-ax[0].axvspan(3, 7, color='#e9c46a', alpha=.25); ax[0].axvspan(7, 17, color='#2a9d8f', alpha=.12); ax[0].axvspan(17, 25, color='#e76f51', alpha=.12)
-ax[0].set_xlabel('Product carbon number'); ax[0].set_ylabel('Mass fraction of converted ethylene (wt%)')
+ax[0].axvspan(3.5, 6.5, color='#e9c46a', alpha=.22, label='Renewable naphtha range')
+ax[0].axvspan(7.5, 16.5, color='#2a9d8f', alpha=.12, label='SAF carbon-number range')
+ax[0].axvspan(17.5, 25, color='#e76f51', alpha=.10, label='Diesel-range products')
+ax[0].set_xlabel('Product carbon number (C-number)'); ax[0].set_ylabel('Mass fraction of converted ethylene (wt%)')
 ax[0].set_title('ASF Product Distribution at 35 bar')
-ax[0].legend(title='Reactor temperature', frameon=False)
+ax[0].legend(title='Temperature and product range', frameon=False, fontsize=8)
 Tg = np.linspace(363, 423, 40)
 for P in (25, 35, 45): ax[1].plot(Tg - 273.15, [weight_fractions(alpha_from_T_P(T, P, b0, dE))[3:8].sum() * 100 for T in Tg], label=f'{P} bar')
 ax[1].set_xlabel('Oligomerization temperature (°C)'); ax[1].set_ylabel('C8–C16 selectivity (wt% of converted ethylene)')
