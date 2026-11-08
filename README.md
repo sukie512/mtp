@@ -14,7 +14,7 @@ The default settings are configured for:
 - **Finance:** India-specific settings in settings.py
 - **Oligomerization:** temperature- and pressure-dependent ASF chain-growth model
 
-The 2G ethanol input of INR 160/L is a quoted production-cost proxy, not an administered ex-mill price. The conventional-route transport proxy is not applied to 2G; 2G delivery/logistics remains excluded and unresolved. The conventional-route transport proxy is not applied to 2G; the 2G delivery/logistics cost remains excluded and unresolved. The green off-site hydrogen price is a refinery-gate anchor; delivery to the plant is not fully costed. The route-comparison sweep therefore includes only green off-site and grey refinery hydrogen. Green on-site and blue hydrogen are excluded until electrolyser/renewable-system and CCS costs are represented. These caveats are printed by the runner and must accompany any reported baseline MJSP.
+The 2G ethanol baseline is provisionally INR 120/L, based on 2026 industry commentary describing 2G production costs around INR 120/L. This is an indicative production-cost estimate, not an administered ex-mill price or a project-specific offtake quote. An older 2024 industry quote of around INR 160/L is retained as a high-cost case. 2G delivery/logistics remains excluded and unresolved. The conventional-route transport proxy is not applied to 2G. The green off-site hydrogen price is a refinery-gate anchor; delivery to the plant is not fully costed. The route-comparison sweep therefore includes only green off-site and grey refinery hydrogen. Green on-site and blue hydrogen are excluded until electrolyser/renewable-system and CCS costs are represented. These caveats are printed by the runner and must accompany any reported baseline MJSP.
 
 Conventional routes (B-heavy molasses, C-heavy molasses, cane juice, maize, rice and damaged grain) remain in the ethanol-route comparison sweep. They are not the thesis's 2G baseline.
 
@@ -28,7 +28,8 @@ Conventional routes (B-heavy molasses, C-heavy molasses, cane juice, maize, rice
 | units.py | Custom dehydration, oligomerization, hydrogenation and storage unit operations |
 | system.py | BioSTEAM flowsheet construction and stream/utility price application |
 | tea.py | India-specific discounted-cash-flow TEA |
-| analysis.py | Baseline simulation, headline metrics and deterministic sweeps |
+| analysis.py | Baseline simulation, headline metrics, deterministic sweeps and per-litre SAF operating-cost audit |
+| ethanol_price_basis_audit.py | Runs labelled 1G reference and 2G ethanol-cost cases to reconcile SAF price comparisons |
 | uncertainty.py | Latin-hypercube sampling, coupled process inputs, economic inputs and MJSP metrics |
 | run_all.py | End-to-end runner, terminal tables, CSV exports, PNG/PDF figures and run manifest |
 | run_mc_replicates.py | Independent Latin-hypercube replicates for Monte Carlo stability checks |
@@ -102,6 +103,20 @@ python run_all.py --n 3000 --no-show --out results_3000
 ```
 
 Do not use --quick when the objective is to run the uncertainty analysis.
+
+### Ethanol price-basis audit
+
+A reported SAF selling-price target of INR 180–200/L from an Indian ATJ developer is not a direct validation target for this model's 2G lignocellulosic case. The cited management estimate is associated with an integrated project using an ethanol-to-SAF volume plan of about 2:1 and conventional ethanol economics; the thesis model uses a 2G ethanol cost assumption and its own simulated yield. Do not equate a 1G-oriented sale-price target with a 2G plant-gate MJSP.
+
+Run the reconciliation cases:
+
+```powershell
+python ethanol_price_basis_audit.py --out prefinal_results/ethanol_price_basis_audit.csv
+```
+
+The audit compares a 1G cane-juice administered-price reference (INR 65.61/L), a provisional 2G production-cost estimate (INR 120/L), and the older high-cost 2G estimate (INR 160/L). It reports the ethanol feed cost, hydrogen cost, naphtha/diesel credits, annual operating-cost contributions and simulated ethanol-to-SAF volume ratio per litre of SAF. The 1G row is a comparison case only, not the thesis baseline.
+
+The default 2G cost was refreshed from INR 160/L to INR 120/L using 2026 industry commentary. Both figures are estimates, not audited plant-specific cost data. Keep the INR 160/L case as a stress scenario until a project-specific feedstock supply, ethanol production-cost and delivery basis is established.
 
 ### Supplementary sensitivities
 
