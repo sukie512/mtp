@@ -57,7 +57,7 @@ Use a clean virtual environment. The repository does not currently include a ful
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-pip install biosteam chaospy numpy scipy pandas matplotlib pytest
+pip install -r requirements.txt
 ```
 
 If PowerShell blocks environment activation, use the Python executable inside .venv\Scripts\python.exe directly or activate the environment using your approved local policy.
@@ -78,7 +78,7 @@ Run commands from the repository root (the folder containing run_all.py).
 ### Full analysis — recommended for the thesis run
 
 ```bash
-python run_all.py --n 3000 --no-show
+python run_all.py --n 3000 --seed 1234 --no-show
 ```
 
 This runs the baseline, cost breakdown, ASF analysis, ethanol-route comparison, hydrogen-route comparison, plant-scale sweep, temperature-pressure sweep, catalyst-deactivation sweep, and Monte Carlo analysis with 3,000 Latin-hypercube samples. --no-show saves the figures without opening plot windows.
@@ -111,7 +111,7 @@ The runner writes files under new_results/ by default:
 - Monte Carlo sample table when the full uncertainty run is enabled
 - Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This is an empirical diagnostic using subsets of one LHS design, not independent replicated LHS convergence proof.
 
-The runner reports the number of converged Monte Carlo samples and MJSP percentiles. The baseline balance metrics are process-only: catalyst make-up is reported separately because spent catalyst is not yet modelled as an outlet. Check that count before interpreting the distribution; failed samples are excluded from the reported percentile calculation. Preserve the terminal log with the output folder so the run can be reproduced and reviewed.
+The runner reports the number of converged Monte Carlo samples and MJSP percentiles. The baseline balance metrics are process-only: catalyst make-up is reported separately because spent catalyst is not yet modelled as an outlet. Check that count before interpreting the distribution; failed samples are excluded from the reported percentile calculation. A `run_manifest.json` is also written with the command, seed, Git revision (when available), Python/platform details, dependency versions and baseline inputs/results. Preserve it with the CSVs and figures.
 
 ## ASF selectivity basis
 
