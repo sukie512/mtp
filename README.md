@@ -84,7 +84,7 @@ python run_all.py --n 3000 --seed 1234 --no-show
 
 This runs the baseline, cost breakdown, ASF analysis, ethanol-route comparison, hydrogen-route comparison, plant-scale sweep, temperature-pressure sweep, catalyst-deactivation sweep, and Monte Carlo analysis with 3,000 Latin-hypercube samples. --no-show saves the figures without opening plot windows.
 
-The default output directory is new_results/. It is created automatically. Existing results/ files are not overwritten by the default run.
+The default output directory is prefinal_results/. It is created automatically. Existing results/ files are not overwritten by the default run.
 
 ### Quick deterministic run
 
@@ -108,7 +108,7 @@ Do not use --quick when the objective is to run the uncertainty analysis.
 Run the hydrogen-storage capital sensitivity and an indicative SAF-vs-fossil-ATF price-parity screen:
 
 ```powershell
-python additional_sensitivities.py --out new_results
+python additional_sensitivities.py --out prefinal_results
 ```
 
 The storage sweep tests 1, 3, 7, 14 and 30 days and reports hydrogen tank installed cost, total installed equipment cost, FCI and MJSP. Storage duration changes tank sizing/capital in the current model; it does not simulate dynamic inventory operation or supply interruptions.
@@ -120,14 +120,14 @@ The price-parity screen compares the deterministic SAF MJSP with the configured 
 The prefix-based diagnostic above uses subsets of one LHS design. For a stronger check, run multiple independent designs with distinct seeds:
 
 ```bash
-python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out new_results/replicates
+python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out prefinal_results/replicates
 ```
 
 This performs three fresh 1,000-sample runs, saves each replicate's sample table, and writes `mc_replicate_summary.csv` with valid/failed counts, mean, standard deviation and P5/P50/P95 MJSP. Compare the replicate quantiles and failure fractions; large differences indicate that the uncertainty estimates are not yet stable. This is a diagnostic, not a guarantee of convergence.
 
 ## Outputs
 
-The runner writes files under new_results/ by default:
+The runner writes files under prefinal_results/ by default:
 
 - PNG and PDF versions of the generated figures
 - CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps, plus `sweep_failures.csv` with exception details for any points that required fallback or failed
@@ -155,7 +155,7 @@ The temperature-sensitivity parameter dE remains unresolved unless fitted from s
 
 ## Tests
 
-GitHub Actions runs the unit-test suite on pushes and pull requests targeting `mtp-presentation-cleanup`. The workflow installs the model dependencies on Python 3.11 and runs `python -m pytest -q`; check the Actions result for the exact commit before treating the suite as passing.
+GitHub Actions runs the unit-test suite on pushes and pull requests targeting `mtp-presentation-cleanup`. The workflow installs the model dependencies on Python 3.12 and runs `python -m pytest -q`; check the Actions result for the exact commit before treating the suite as passing.
 
 Run the tests locally from the repository root:
 
