@@ -1,0 +1,11 @@
+# Core process, thermodynamics, uncertainty and plotting dependencies.
+# Record exact resolved versions from the run_manifest.json for each reported run.
+biosteam
+chaospy
+numpy
+scipy
+pandas
+matplotlib
+
+# Test runner
+pytest
