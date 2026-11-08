@@ -112,13 +112,26 @@ def unit_energy_diagnostics(sys):
 
 
 def results(sys, tea, F, s):
-    """One-row summary. Units: USD/gal and INR/L for MJSP; H2 intensity computed correctly (kg H2 per tonne of fuel)."""
+    """One-row TEA summary plus an annualized, plant-gate operating-cost audit per litre of SAF."""
     st = F.stream
     hrs = tea.operating_hours
     p = tea.solve_price(st.SAF)                                    # USD/kg  (NPV = 0)
     saf_gal = st.SAF.F_vol * GAL * hrs
+    saf_litres_yr = st.SAF.F_vol * 1000.0 * hrs
+    saf_litres_hr = st.SAF.F_vol * 1000.0
     fuel_kg = st.SAF.F_mass + st.RN.F_mass + st.RD.F_mass
     ol = F.unit.R202
+
+    # Annualized operating-cost contributions. Stream costs are USD/hr; TEA VOC/FOC are USD/yr.
+    # These explain the operating economics but do not allocate capital recovery, tax, or target IRR.
+    def stream_cost_INR_L(stream):
+        return stream.cost * hrs * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan
+
+    ethanol_feed_cost_INR_L = stream_cost_INR_L(st.Ethanol_In)
+    hydrogen_feed_cost_INR_L = stream_cost_INR_L(st.Hydrogen_In)
+    rn_credit_INR_L = stream_cost_INR_L(st.RN)
+    rd_credit_INR_L = stream_cost_INR_L(st.RD)
+
     return dict(MJSP_USD_gal=p * st.SAF.rho / GAL, MJSP_INR_L=p * st.SAF.rho / 1000 * s['fx'],
                 SAF_MMgal_yr=saf_gal / 1e6, SAF_frac_of_fuel=st.SAF.F_mass / fuel_kg,
                 RN_MMgal_yr=st.RN.F_vol * GAL * hrs / 1e6, RD_MMgal_yr=st.RD.F_vol * GAL * hrs / 1e6,
@@ -127,6 +140,16 @@ def results(sys, tea, F, s):
                 installed_MM_USD=tea.installed_equipment_cost / 1e6, FCI_MM_USD=tea.FCI / 1e6,
                 FOC_MM_USD_yr=tea.FOC / 1e6, VOC_MM_USD_yr=tea.VOC / 1e6, sales_MM_USD_yr=tea.sales / 1e6,
                 ethanol_cost_share=st.Ethanol_In.cost * hrs / (tea.VOC + tea.FOC),
+                # New audit columns: all values are INR per litre of SAF at the model battery limit.
+                ethanol_feed_cost_INR_L_SAF=ethanol_feed_cost_INR_L,
+                hydrogen_feed_cost_INR_L_SAF=hydrogen_feed_cost_INR_L,
+                naphtha_credit_INR_L_SAF=rn_credit_INR_L,
+                diesel_credit_INR_L_SAF=rd_credit_INR_L,
+                total_coproduct_credit_INR_L_SAF=rn_credit_INR_L + rd_credit_INR_L,
+                annual_VOC_INR_L_SAF=tea.VOC * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan,
+                annual_FOC_INR_L_SAF=tea.FOC * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan,
+                ethanol_to_SAF_volume_ratio=st.Ethanol_In.F_vol / st.SAF.F_vol if st.SAF.F_vol else np.nan,
+                SAF_volume_yield_per_feed=st.SAF.F_vol / st.Ethanol_In.F_vol if st.Ethanol_In.F_vol else np.nan,
                 **process_mass_balance_diagnostics(sys),
                 **elemental_balance_errors(sys))
 
