@@ -166,12 +166,14 @@ fig.text(0.01, 0.005, 'Exploratory model output: temperature sensitivity depends
 fig.set_size_inches(14, 5.5); fig.tight_layout(rect=(0, 0.04, 1, 1)); save(fig, '02_asf_product_distribution')
 
 # ------------------------------------------------------------------ 4 ethanol route
-head('4. ETHANOL FEEDSTOCK ROUTE (administered ex-mill prices ESY 2025-26)')
+head('4. ETHANOL FEEDSTOCK ROUTE COMPARISON (1G administered prices; 2G cost proxy)')
 er = safe(A.sweep_ethanol_route, [({'route': r}, {'ethanol_route': r}) for r in cfg.S['ethanol_exmill_INR_L']], 'sweep_ethanol_route'); table(er, 'ethanol_routes', ['route', 'MJSP_USD_gal', 'MJSP_INR_L', 'SAF_MMgal_yr'])
 fig, ax = plt.subplots(figsize=(9, 5)); b = ax.bar(er.route, er.MJSP_INR_L, color='#4c8298')
 ax.bar_label(b, fmt='%.0f', padding=4); ax.set_ylabel('Minimum jet selling price (INR/L)')
 ax.set_title('Minimum Jet Selling Price by Ethanol Feedstock Route')
-ax.set_xlabel('Ethanol feedstock route'); plt.xticks(rotation=20, ha='right'); fig.tight_layout(); save(fig, '03_ethanol_route_comparison')
+ax.set_xlabel('Ethanol feedstock route'); plt.xticks(rotation=20, ha='right')
+fig.text(0.01, 0.01, 'Caution: 2G cellulosic ethanol uses a production-cost proxy, not an administered ex-mill price; a common transport adder is applied to all routes.', fontsize=8, color='#555555')
+fig.tight_layout(rect=(0, 0.05, 1, 1)); save(fig, '03_ethanol_route_comparison')
 
 # ------------------------------------------------------------------ 5 hydrogen
 head('5. HYDROGEN SUPPLY ROUTE COMPARISON')
