@@ -54,6 +54,27 @@ def elemental_balance_errors(sys, elements=('C', 'H', 'O')):
     return errors
 
 
+def unit_energy_diagnostics(sys):
+    """Return unit-level net heat duty and power demand for independent review."""
+    rows = []
+    for unit in sys.units:
+        try:
+            duty = float(unit.net_duty)
+        except Exception:
+            duty = np.nan
+        try:
+            power = float(unit.net_power)
+        except Exception:
+            power = np.nan
+        rows.append({
+            'unit_ID': unit.ID,
+            'unit_type': type(unit).__name__,
+            'net_duty_kJ_hr': duty,
+            'net_power_kW': power,
+        })
+    return pd.DataFrame(rows)
+
+
 def results(sys, tea, F, s):
     """One-row summary. Units: USD/gal and INR/L for MJSP; H2 intensity computed correctly (kg H2 per tonne of fuel)."""
     st = F.stream
