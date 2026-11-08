@@ -112,7 +112,7 @@ def safe(sweep_fn, fallback_rows, label):
 T0 = time.time()
 def head(t): print('\n' + '=' * 78 + f'\n{t}\n' + '=' * 78, flush=True)
 def _free_path(name, ext):
-    """Path in results/ for name+ext. If that file is locked (open in Excel / a VS Code tab on Windows),
+    """Path in the selected output folder for name+ext. If that file is locked (open in Excel / a VS Code tab on Windows),
     use name_<time>.ext instead so the run never crashes after a long computation."""
     p = os.path.join(OUT, name + ext)
     try:
@@ -390,5 +390,5 @@ if not args.no_show:
     try:
         plt.show()
     except KeyboardInterrupt:
-        print('\nPlot display interrupted. PNG files were already saved in results/.')
+        print('\nPlot display interrupted. PNG files were already saved in the selected output folder.')
         pass
