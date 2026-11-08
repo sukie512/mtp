@@ -39,7 +39,7 @@ S = dict(
     # Administered ex-mill prices, Rs/litre, ESY 2025-26 (1 Nov 2025 - 31 Oct 2026). [VERIFIED-26]
     #  sources: dataful.in/datasets/21605 (MoPNG series); bioenergytimes.com (Jul 2026, MoS Petroleum written reply);
     #           iamrenew.com / bioenergytimes.com (FCI rice Rs 60.32).
-    ethanol_route='B_heavy',
+    ethanol_route='2G_cellulosic',  # thesis baseline: lignocellulosic (2G) ethanol; 1G routes remain comparison cases
     ethanol_exmill_INR_L={'C_heavy': 57.97, 'B_heavy': 60.73, 'cane_juice': 65.61,
                           'FCI_rice': 60.32, 'damaged_grain': 64.00, 'maize': 71.86,
                           '2G_cellulosic': 160.0},  # 2G: [VERIFIED-26 as a cost, not an administered price] industry executive quoted ~Rs 160/L production cost (autocarpro.in/NEWS/can-india-overcome-the-economic-challenges-of-higher-generation-ethanol-123309); OMCs set 2G prices case by case (PIB PRID=1770518)
