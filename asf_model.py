@@ -8,9 +8,17 @@ def weight_fractions(alpha, kmax=60):
     """Weight fraction of each k-mer (k ethylene units, carbon number 2k), as fraction of
     CONVERTED ethylene mass. ASF: mole fraction n_k = (1-a) a^(k-1); mass ∝ k*n_k,
     so w_k = k (1-a)^2 a^(k-1). Returns array index 0 -> k=1 (C2, i.e. butene is index 1)."""
+    if not 0.0 < alpha < 1.0:
+        raise ValueError('alpha must lie strictly between 0 and 1')
     k = np.arange(1, kmax + 1)
     w = k * (1 - alpha) ** 2 * alpha ** (k - 1)
-    return w / w.sum()
+    # The final entry represents the entire k >= kmax tail. This preserves the
+    # exact infinite ASF mass balance instead of renormalizing a truncated series.
+    if kmax > 1:
+        w[-1] = 1.0 - w[:-1].sum()
+    else:
+        w[-1] = 1.0
+    return w
 
 def alpha_from_T_P(T, P, beta0, dE, T_ref=393.0, P_ref=35.0):
     """alpha = 1/(1+beta); beta = termination/propagation rate ratio.
