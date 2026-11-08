@@ -102,6 +102,18 @@ python run_all.py --n 3000 --no-show --out results_3000
 
 Do not use --quick when the objective is to run the uncertainty analysis.
 
+### Supplementary sensitivities
+
+Run the hydrogen-storage capital sensitivity and an indicative SAF-vs-fossil-ATF price-parity screen:
+
+```powershell
+python additional_sensitivities.py --out new_results
+```
+
+The storage sweep tests 1, 3, 7, 14 and 30 days and reports hydrogen tank installed cost, total installed equipment cost, FCI and MJSP. Storage duration changes tank sizing/capital in the current model; it does not simulate dynamic inventory operation or supply interruptions.
+
+The price-parity screen compares the deterministic SAF MJSP with the configured fossil ATF benchmark. It is **not a subsidy estimate**: the SAF model price and fossil benchmark may differ in tax, delivery, date and location basis. Harmonize those bases before drawing a policy conclusion.
+
 ### Independent LHS replicate check
 
 The prefix-based diagnostic above uses subsets of one LHS design. For a stronger check, run multiple independent designs with distinct seeds:
