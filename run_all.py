@@ -49,37 +49,65 @@ SWEEP_FAILURES = []
 
 
 def safe(sweep_fn, fallback_rows, label):
-    """Run a sweep, retrying point-by-point if a combined sweep fails.
+    """Run a sweep and retry any failed/non-finite operating points individually.
 
-    Failed operating points are retained as NaN rows and their exception
-    details are exported to sweep_failures.csv; they are never silently hidden.
+    A combined sweep can return a DataFrame containing NaN/inf values without
+    raising an exception. Those rows are now detected and retried rather than
+    silently carried into plots and CSVs.
     """
+    result = None
     try:
-        return sweep_fn()
+        result = sweep_fn()
     except Exception as e:
         SWEEP_FAILURES.append({
             'sweep': label, 'case': 'combined_sweep',
             'error_type': type(e).__name__, 'error': str(e),
         })
-        print(f'   note: {label} hit a solver failure ({str(e)[:70]}...); re-running point by point, bad points -> NaN', flush=True)
-        rows = []
-        result_columns = None
-        for extra, kw in fallback_rows:
-            try:
-                row = A.results(*A.run(**kw))
-                result_columns = list(row)
-                rows.append(dict(extra, **row))
-            except Exception as point_error:
-                SWEEP_FAILURES.append({
-                    'sweep': label, 'case': repr(extra),
-                    'error_type': type(point_error).__name__, 'error': str(point_error),
-                })
-                # Determine the output schema at most once; do not rerun the baseline for every failed point.
-                if result_columns is None:
-                    try: result_columns = list(A.results(*A.run()))
-                    except Exception: result_columns = []
-                rows.append(dict(extra, **{k: np.nan for k in result_columns}))
-        return pd.DataFrame(rows)
+        print(f'   note: {label} hit a solver failure ({str(e)[:70]}...); retrying point by point', flush=True)
+
+    if result is not None:
+        metric_cols = [
+            col for col in ('MJSP_USD_gal', 'MJSP_INR_L', 'SAF_MMgal_yr', 'FCI_MM_USD')
+            if col in result.columns
+        ]
+        if metric_cols:
+            metric_data = result[metric_cols].apply(pd.to_numeric, errors='coerce')
+            invalid_mask = ~np.isfinite(metric_data.to_numpy(dtype=float)).all(axis=1)
+            if not invalid_mask.any():
+                return result
+        else:
+            return result
+    else:
+        invalid_mask = np.ones(len(fallback_rows), dtype=bool)
+
+    rows = []
+    result_columns = list(result.columns) if result is not None else []
+    for i, (extra, kw) in enumerate(fallback_rows):
+        if result is not None and i < len(result) and not invalid_mask[i]:
+            rows.append(result.iloc[i].to_dict())
+            continue
+        if result is not None and i < len(result):
+            SWEEP_FAILURES.append({
+                'sweep': label, 'case': repr(extra),
+                'error_type': 'NonFiniteResult',
+                'error': 'Combined sweep returned a non-finite headline metric; retried individually.',
+            })
+        try:
+            row = A.results(*A.run(**kw))
+            result_columns = list(row)
+            rows.append(dict(extra, **row))
+        except Exception as point_error:
+            SWEEP_FAILURES.append({
+                'sweep': label, 'case': repr(extra),
+                'error_type': type(point_error).__name__, 'error': str(point_error),
+            })
+            if not result_columns:
+                try:
+                    result_columns = list(A.results(*A.run()))
+                except Exception:
+                    result_columns = []
+            rows.append(dict(extra, **{k: np.nan for k in result_columns}))
+    return pd.DataFrame(rows)
 
 T0 = time.time()
 def head(t): print('\n' + '=' * 78 + f'\n{t}\n' + '=' * 78, flush=True)
