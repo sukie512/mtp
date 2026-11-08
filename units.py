@@ -7,6 +7,8 @@ units.py -- custom BioSTEAM unit classes.  Depends on: asf_model.py, chemicals.p
    Hydrogenator       olefins + H2 -> paraffins (adiabatic, 100%)
  StorageTank          generic power-law tank/vessel cost (ethanol, H2, products)
 """
+import warnings
+
 import numpy as np
 import biosteam as bst
 
@@ -20,6 +22,12 @@ except ImportError:
 def vessel_purchase_cost(V_m3, P_Pa, LD=3.0, sigma=15000., E=0.85):
     """Vertical carbon-steel pressure vessel, Seider et al. 'Product & Process Design Principles' 4th ed. (Wiley 2017)
     correlations (CE=500 basis) -- coefficients typed from memory: VERIFY against the book before publishing."""
+    warnings.warn(
+        "Custom pressure-vessel cost correlation in units.py is not yet verified against its cited source; "
+        "treat reactor vessel purchase costs and derived FCI as preliminary.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
     D = (4 * V_m3 / (np.pi * LD)) ** (1 / 3); L = LD * D
     Dft, Lft = D * 3.28084, L * 3.28084
     Pg = max(P_Pa / 6894.76 - 14.7, 15.)
