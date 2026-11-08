@@ -14,7 +14,7 @@ The default settings are configured for:
 - **Finance:** India-specific settings in settings.py
 - **Oligomerization:** temperature- and pressure-dependent ASF chain-growth model
 
-The 2G ethanol input of INR 160/L is a quoted production-cost proxy, not an administered ex-mill price. The current transport adder and delivered-price basis are unresolved. The green off-site hydrogen price is a refinery-gate anchor; delivery to the plant is not fully costed. These caveats are printed by the runner and must accompany any reported baseline MJSP.
+The 2G ethanol input of INR 160/L is a quoted production-cost proxy, not an administered ex-mill price. The current transport adder and delivered-price basis are unresolved. The green off-site hydrogen price is a refinery-gate anchor; delivery to the plant is not fully costed. The route-comparison sweep therefore includes only green off-site and grey refinery hydrogen. Green on-site and blue hydrogen are excluded until electrolyser/renewable-system and CCS costs are represented. These caveats are printed by the runner and must accompany any reported baseline MJSP.
 
 Conventional routes (B-heavy molasses, C-heavy molasses, cane juice, maize, rice and damaged grain) remain in the ethanol-route comparison sweep. They are not the thesis's 2G baseline.
 
@@ -130,7 +130,7 @@ These tests cover ASF distribution normalization, the oligomer-product basis, th
 ## Important limitations before using results in a thesis
 
 1. **2G ethanol price:** INR 160/L is a production-cost proxy; the transport and delivered basis are unresolved.
-2. **Hydrogen boundary:** green off-site delivery cost is not fully represented. Green on-site hydrogen requires electrolyser CAPEX, renewable electricity, water treatment, compression/storage, stack replacement and utilization assumptions.
+2. **Hydrogen boundary:** green off-site delivery cost is not fully represented. Green on-site and blue hydrogen are excluded from the comparison sweep because green on-site requires electrolyser CAPEX, renewable electricity, water treatment, compression/storage, stack replacement and utilization assumptions, while blue hydrogen requires a sourced CCS cost.
 3. **ASF selectivity:** C8+ calibration is not C8–C16 SAF selectivity. The fixed literature split and ASF model are structurally different representations.
 4. **Temperature dependence:** dE is not fitted unless supported by multiple temperature-selectivity observations.
 5. **Catalyst deactivation:** cycle-average activity decay and catalyst replacement lifetime are separate assumptions.
