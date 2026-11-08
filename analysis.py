@@ -131,8 +131,11 @@ def results(sys, tea, F, s):
     hydrogen_feed_cost_INR_L = stream_cost_INR_L(st.Hydrogen_In)
     rn_credit_INR_L = stream_cost_INR_L(st.RN)
     rd_credit_INR_L = stream_cost_INR_L(st.RD)
+    mjsp_inr_l = p * st.SAF.rho / 1000 * s['fx']
+    annual_voc_inr_l = tea.VOC * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan
+    annual_foc_inr_l = tea.FOC * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan
 
-    return dict(MJSP_USD_gal=p * st.SAF.rho / GAL, MJSP_INR_L=p * st.SAF.rho / 1000 * s['fx'],
+    return dict(MJSP_USD_gal=p * st.SAF.rho / GAL, MJSP_INR_L=mjsp_inr_l,
                 SAF_MMgal_yr=saf_gal / 1e6, SAF_frac_of_fuel=st.SAF.F_mass / fuel_kg,
                 RN_MMgal_yr=st.RN.F_vol * GAL * hrs / 1e6, RD_MMgal_yr=st.RD.F_vol * GAL * hrs / 1e6,
                 alpha=ol.alpha, olig_X_avg=ol.X_avg,
@@ -146,8 +149,12 @@ def results(sys, tea, F, s):
                 naphtha_credit_INR_L_SAF=rn_credit_INR_L,
                 diesel_credit_INR_L_SAF=rd_credit_INR_L,
                 total_coproduct_credit_INR_L_SAF=rn_credit_INR_L + rd_credit_INR_L,
-                annual_VOC_INR_L_SAF=tea.VOC * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan,
-                annual_FOC_INR_L_SAF=tea.FOC * s['fx'] / saf_litres_yr if saf_litres_yr else np.nan,
+                annual_VOC_INR_L_SAF=annual_voc_inr_l,
+                annual_FOC_INR_L_SAF=annual_foc_inr_l,
+                capital_tax_finance_return_residual_INR_L_SAF=(
+                    mjsp_inr_l - annual_voc_inr_l - annual_foc_inr_l
+                    if np.isfinite(annual_voc_inr_l) and np.isfinite(annual_foc_inr_l) else np.nan
+                ),
                 ethanol_to_SAF_volume_ratio=st.Ethanol_In.F_vol / st.SAF.F_vol if st.SAF.F_vol else np.nan,
                 SAF_volume_yield_per_feed=st.SAF.F_vol / st.Ethanol_In.F_vol if st.Ethanol_In.F_vol else np.nan,
                 **process_mass_balance_diagnostics(sys),
