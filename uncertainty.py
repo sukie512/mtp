@@ -44,9 +44,16 @@ def set_oligomerization_temperature(units, value):
 
 
 def set_oligomerization_pressure(units, value):
-    """Keep the ethylene compressor discharge and oligomerization reactor at sampled pressure."""
-    units.K202.P = float(value)
-    units.R202.P = float(value)
+    """Keep compressor, ethylene purification column, and reactor at sampled pressure.
+
+    D202 is downstream of K202 and upstream of the oligomerizer. Updating only
+    the compressor and reactor leaves the distillation column at its baseline
+    pressure during a coupled Monte Carlo sample.
+    """
+    pressure = float(value)
+    units.K202.P = pressure
+    units.D202.P = pressure
+    units.R202.P = pressure
 
 
 def build_model(sys, tea, F, s, MJSP_stream='SAF'):
