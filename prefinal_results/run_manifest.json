@@ -1,0 +1,141 @@
+{
+  "started_at_local": "2026-11-09T02:34:04",
+  "completed_at_local": "2026-11-09T02:40:36",
+  "elapsed_minutes": 6.543,
+  "command_line": [
+    "run_all.py",
+    "--n",
+    "3000",
+    "--seed",
+    "1234",
+    "--no-show",
+    "--out",
+    "prefinal_results"
+  ],
+  "quick_mode": false,
+  "monte_carlo_samples_requested": 3000,
+  "monte_carlo_seed": 1234,
+  "output_directory": "C:\\Users\\Sakshi\\Downloads\\atj_codefiles (1)\\prefinal_results",
+  "git_revision": "14cc930c4bdfb20b8ff4340bd1d9c7236fa8a0eb",
+  "python_version": "3.12.10",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "package_versions": {
+    "biosteam": "2.54.0",
+    "thermosteam": "0.54.2",
+    "chaospy": "4.3.21",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "pandas": "3.1.0",
+    "matplotlib": "3.11.2"
+  },
+  "model_inputs": {
+    "fx": 94.1402,
+    "CEPCI": 800.8,
+    "location_factor": 0.9,
+    "IRR": 0.1,
+    "income_tax": 0.2517,
+    "finance_fraction": 0.6,
+    "finance_interest": 0.1,
+    "finance_years": 10,
+    "duration": [
+      2027,
+      2057
+    ],
+    "operating_days": 330,
+    "construction_schedule": [
+      0.08,
+      0.6,
+      0.32
+    ],
+    "WC_over_FCI": 0.05,
+    "wdv_rate": 0.15,
+    "ethanol_KLPD": 200.0,
+    "ethanol_purity_wt": 0.995,
+    "ethanol_density": 789.0,
+    "ethanol_route": "2G_cellulosic",
+    "ethanol_exmill_INR_L": {
+      "C_heavy": 57.97,
+      "B_heavy": 60.73,
+      "cane_juice": 65.61,
+      "FCI_rice": 60.32,
+      "damaged_grain": 64.0,
+      "maize": 71.86,
+      "2G_cellulosic": 160.0
+    },
+    "ethanol_transport_INR_L_conventional": 1.2,
+    "h2_route": "green_offsite",
+    "h2_INR_kg": {
+      "green_offsite": 358.0,
+      "green_onsite": 358.0,
+      "grey_smr_refinery": 198.0,
+      "blue_smr_ccs": 260.0
+    },
+    "h2_comparison_routes": [
+      "green_offsite",
+      "grey_smr_refinery"
+    ],
+    "h2_storage_days": 7,
+    "h2_ratio": 3.0,
+    "h2_recovery": 0.85,
+    "rn_USD_kg": 0.8,
+    "rd_USD_kg": 0.72,
+    "elec_INR_kWh": 6.5,
+    "ng_INR_kg": 50.0,
+    "wastewater_USD_kg": 0.00185,
+    "labor_USD_yr": 1200000.0,
+    "cat_price_USD_kg": {
+      "dehyd": 36.81,
+      "olig": 158.4,
+      "hydgn": 59.12
+    },
+    "cat_life_yr": {
+      "dehyd": 2.0,
+      "olig": 1.0,
+      "hydgn": 3.0
+    },
+    "dehyd": {
+      "T": 754.0,
+      "P": 1063000.0,
+      "X": 0.995,
+      "whsv": 0.3
+    },
+    "olig": {
+      "T": 393.15,
+      "P": 3500000.0,
+      "X0": 0.993,
+      "whsv": 1.5,
+      "mode": "asf",
+      "c8plus_ref": 0.63,
+      "dE": 15000.0,
+      "kd": 0.002,
+      "cycle_days": 60.0
+    },
+    "hydgn": {
+      "T": 623.15,
+      "P": 3500000.0,
+      "X": 1.0,
+      "whsv": 3.0
+    },
+    "fossil_atf_INR_L": 138.5
+  },
+  "monte_carlo_summary": {
+    "requested_samples": 3000,
+    "valid_samples": 2994,
+    "failed_or_nonfinite_samples": 6,
+    "failure_fraction": 0.002,
+    "MJSP_INR_L_percentiles": {
+      "P5": 518.4251051892655,
+      "P25": 544.3894154772975,
+      "P50": 565.3229733333544,
+      "P75": 586.5704718223221,
+      "P95": 616.3496934961305
+    }
+  },
+  "baseline": {
+    "ethanol_route": "2G_cellulosic",
+    "hydrogen_route": "green_offsite",
+    "ethanol_capacity_KLPD": 200.0,
+    "MJSP_INR_L": 548.0128269981672,
+    "SAF_MMgal_yr": 5.72064865692571
+  }
+}

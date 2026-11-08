@@ -1,0 +1,4 @@
+replicate_a,replicate_b,spearman_rank_agreement,shared_parameters
+replicate_01,replicate_02,0.8226086956521739,24
+replicate_01,replicate_03,0.6765217391304347,24
+replicate_02,replicate_03,0.677391304347826,24

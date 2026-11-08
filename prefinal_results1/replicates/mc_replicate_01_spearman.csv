@@ -1,0 +1,25 @@
+parameter,spearman_rho
+Ethanol purchase-cost input [INR/L],0.7467474248076575
+Naphtha (rn) price [USD/kg],-0.31731744608852885
+Oligomerization T [K],0.2520648358140795
+Labor cost [USD/yr],0.22771067057232164
+Location factor,0.18244632614194206
+Diesel (rd) price [USD/kg],-0.13717099591757634
+Olig. catalyst life [yr],-0.0939132007226069
+Oligomerization P [Pa],-0.09334902587606592
+ASF d E (Eterm-Eprop) [J/mol],0.09018754374058764
+Olig. WHSV,-0.05864676180835078
+Dehyd catalyst price [USD/kg],0.0536560483957786
+INR/USD,0.05312184907282826
+Electricity tariff [INR/kWh],-0.03974266103539696
+Dehydration WHSV,-0.0396675833949579
+Hydrogenation catalyst life [yr],-0.0356431852503233
+Natural gas price [INR/kg],0.032545879467405565
+Hydrogen refinery-gate price (delivery excluded) [INR/kg],0.031044543960043965
+Loan interest,0.017953557966382008
+Olig catalyst price [USD/kg],0.010594367731912632
+Olig. conversion X0,0.008526213544072733
+Olig. deactivation kd [1/day],-0.007308299449251363
+Dehydration conversion,0.006241144250362286
+Olig. cycle length [day],-0.0052866960543899175
+Hydgn catalyst price [USD/kg],-0.0036055194777855747

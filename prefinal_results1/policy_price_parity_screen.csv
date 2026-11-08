@@ -1,0 +1,2 @@
+SAF_MJSP_INR_L,fossil_ATF_benchmark_INR_L,SAF_minus_ATF_INR_L,SAF_to_ATF_price_ratio,parity_status,benchmark_basis_note,benchmark_source_value_from_settings_INR_L
+425.7667411382668,138.5,287.2667411382668,3.0741280948611323,above_benchmark,"Indicative only: model MJSP is a plant-gate model output, while the configured fossil ATF benchmark is a Delhi market/retail reference. Tax, delivery, date and location bases are not harmonized.",138.5

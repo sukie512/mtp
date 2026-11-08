@@ -1,0 +1,36 @@
+{
+  "started_at_local": "2026-11-09T01:56:15",
+  "completed_at_local": "2026-11-09T02:04:28",
+  "elapsed_minutes": 8.223,
+  "command_line": [
+    "run_all.py",
+    "--n",
+    "3000",
+    "--seed",
+    "1234",
+    "--no-show"
+  ],
+  "quick_mode": false,
+  "monte_carlo_samples_requested": 3000,
+  "monte_carlo_seed": 1234,
+  "output_directory": "C:\\Users\\Sakshi\\Downloads\\atj_codefiles (1)\\new_results",
+  "git_revision": "14146cbb7a79d35fcb4ba378104be0ddda769d67",
+  "python_version": "3.12.10",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "package_versions": {
+    "biosteam": "2.54.0",
+    "thermosteam": "0.54.2",
+    "chaospy": "4.3.21",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "pandas": "3.1.0",
+    "matplotlib": "3.11.2"
+  },
+  "baseline": {
+    "ethanol_route": "2G_cellulosic",
+    "hydrogen_route": "green_offsite",
+    "ethanol_capacity_KLPD": 200.0,
+    "MJSP_INR_L": 554.8581096200015,
+    "SAF_MMgal_yr": 5.72064865692571
+  }
+}
