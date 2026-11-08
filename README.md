@@ -131,7 +131,9 @@ The temperature-sensitivity parameter dE remains unresolved unless fitted from s
 
 ## Tests
 
-Run the pure calculation tests from the repository root:
+GitHub Actions runs the unit-test suite on pushes and pull requests targeting `main` or `mtp-presentation-cleanup`. The workflow installs the model dependencies on Python 3.11 and runs `python -m pytest -q`; check the Actions result for the exact commit before treating the suite as passing.
+
+Run the tests locally from the repository root:
 
 ```bash
 pytest -q
