@@ -56,8 +56,8 @@ The `.xlsm` literature/input workbook is not read or modified by the plotting ch
 
 These are not cosmetic issues. They can change the reported MJSP, selectivity or engineering interpretation. They have deliberately not been silently changed.
 
-1. **ASF monomer basis (important):** `weight_fractions()` includes the `k=1` C2/ethylene term, while the oligomerizer writes product streams only for `k=2...9`. Confirm whether the literature selectivity denominator is total converted ethylene including monomer, or only oligomer products C4+. The current reactor applies the nominal conversion to the ASF distribution including k=1, but only subtracts/writes product streams for k=2...9. Consequently, the realised ethylene conversion is lower than the nominal X by the k=1 fraction. Decide whether k=1 represents unreacted ethylene (in which case the product distribution should be conditioned on k≥2) or a genuine product category, then align conversion, calibration and reported selectivity on that basis. Do not claim a validated C8–C16 yield until this is resolved.
-2. **63% reference selectivity:** the current calibration target is 63 wt% C8+ (k ≥ 4) according to the code's ASF basis; it is not the same as 63 wt% C8–C16 SAF. The paper's fixed 20/15/62/3 split is a different product-distribution assumption. Keep the comparison explicit.
+1. **ASF monomer basis (corrected in this branch):** the raw ASF distribution includes `k=1` C2/ethylene, but the oligomerizer produces only `k=2...9` oligomers. The new `oligomer_weight_fractions()` helper removes the monomer term and renormalizes the product distribution over `k >= 2`. The reactor now applies its nominal conversion `X` across this product-only distribution, so the omitted monomer fraction no longer silently reduces realised conversion. The raw `weight_fractions()` helper remains available for the full ASF distribution.
+2. **63% reference selectivity:** calibration now interprets the Heveling 63 wt% C8+ reference on the oligomer-product basis (`k >= 2`). It is still not 63 wt% C8–C16 SAF: the C8+ category includes products heavier than C16. The paper's fixed 20/15/62/3 split is a different product-distribution assumption. The ASF model's C8–C16 fraction is structurally bounded well below 63%; compare the two assumptions explicitly.
 3. **Temperature sensitivity parameter:** `dE = 15 kJ/mol` is currently an unresolved assumption. A single reference selectivity point can calibrate the intercept (`beta0`) but cannot identify the temperature slope (`dE`). T–P sweep trends are exploratory until a second or multiple temperature-selectivity data points support a fit.
 4. **Catalyst deactivation:** `kd` and cycle length affect cycle-average activity, while catalyst lifetime affects replacement cost. They are separate inputs and need separate evidence; one must not be used as a proxy for the other.
 5. **Depreciation:** `tea.py` creates a WDV-shaped depreciation vector and normalizes it to 100% over the project life. That is a modelling simplification, not automatically the Indian statutory WDV tax schedule. Confirm the intended tax treatment, terminal book value and disposal treatment with the TEA methodology before using the tax shield in a final result.
@@ -80,10 +80,10 @@ This runs the deterministic cases and saves the figures/tables without opening p
 For the full uncertainty run:
 
 ```bash
-python run_all.py --n 300 --no-show
+python run_all.py --n 3000 --no-show
 ```
 
-The figures are written to `results/` as high-resolution PNG and PDF files; tables are exported as CSV. The full Monte Carlo runtime depends on the machine and convergence behaviour.
+The figures are written to `new_results/` by default as high-resolution PNG and PDF files; tables are exported as CSV. Use `--out another_folder` to select a different output directory. The full Monte Carlo runtime depends on the machine and convergence behaviour.
 
 ## Validation status
 
