@@ -123,7 +123,7 @@ The temperature-sensitivity parameter dE remains unresolved unless fitted from s
 
 ## Monte Carlo interpretation
 
-- **Coupled parameters** change the process model and require flowsheet re-simulation.
+- **Coupled parameters** change the process model and require flowsheet re-simulation. The oligomerization-pressure setter synchronizes the upstream compressor (K202), ethylene purification column (D202), and oligomerization reactor (R202); changing only two of these would leave an internally inconsistent sampled case.
 - **Isolated parameters** change economics without changing material flows.
 - Labour cost and loan interest setters update the live TEA object as well as the settings dictionary.
 - The distributions and ranges in uncertainty.py are not all empirical probability distributions. Several are judgement-based ranges or placeholders and must be supported with citations or clearly presented as scenario assumptions.
