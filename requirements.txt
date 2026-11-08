@@ -1,4 +1,5 @@
 # Core process, thermodynamics, uncertainty and plotting dependencies.
+# Use Python >=3.12: current ThermoSTEAM releases require it (PEP 701 f-string syntax).
 # Record exact resolved versions from the run_manifest.json for each reported run.
 biosteam
 chaospy
