@@ -43,12 +43,11 @@ S = dict(
     ethanol_exmill_INR_L={'C_heavy': 57.97, 'B_heavy': 60.73, 'cane_juice': 65.61,
                           'FCI_rice': 60.32, 'damaged_grain': 64.00, 'maize': 71.86,
                           '2G_cellulosic': 160.0},  # 2G: [VERIFIED-26 as a cost, not an administered price] industry executive quoted ~Rs 160/L production cost (autocarpro.in/NEWS/can-india-overcome-the-economic-challenges-of-higher-generation-ethanol-123309); OMCs set 2G prices case by case (PIB PRID=1770518)
-    ethanol_transport_INR_L=1.2,  # DERIVED from [VERIFIED-26]: delivered 71.18 (IOCL) - 66.61*1.05 (ex-mill + 5% GST) = ~1.24 Rs/L. GST assumed creditable (excluded).
-    #   CAVEAT (review, Oct 2026): this transport adder is applied uniformly to EVERY route in ethanol_exmill_INR_L,
-    #   including the 2G_cellulosic Rs 160/L figure, which is a quoted PRODUCTION COST (autocarpro.in), not an
-    #   ex-mill/delivered price -- it may already price in logistics, or may need a different (likely larger)
-    #   transport/storage adder since 2G plants are not co-located with distilleries the same way. UNRESOLVED:
-    #   do not treat ethanol_price_USD_kg('2G_cellulosic') as validated; it is production cost + an unchecked adder.
+    ethanol_transport_INR_L_conventional=1.2,  # DERIVED conventional-route proxy: delivered IOCL price less ex-mill + assumed creditable GST; not a 2G logistics estimate.
+    #   2G_cellulosic is a quoted production-cost proxy, not an administered ex-mill price. Its separate
+    #   delivery/storage cost is unknown, so the generic conventional-route adder is NOT applied to 2G.
+    #   This avoids adding an unsupported Rs 1.2/L to the 2G cost, but does NOT mean 2G delivery is free:
+    #   the current 2G feed-price boundary is production-cost proxy with logistics unresolved/excluded.
     # ------------------------------------------------------------------ hydrogen
     h2_route='green_offsite',
     # H2 price, INR/kg.
@@ -132,8 +131,12 @@ def ethanol_kg_hr(s):
     return s['ethanol_KLPD'] * ethanol_feed_density(s) / 24.0
 
 def ethanol_price_USD_kg(s):
-    inr_l = s['ethanol_exmill_INR_L'][s['ethanol_route']] + s['ethanol_transport_INR_L']
-    return inr_l / s['fx'] / (s['ethanol_density'] / 1000.0)          # Rs/L -> USD/kg
+    route = s['ethanol_route']
+    transport = 0.0 if route == '2G_cellulosic' else s['ethanol_transport_INR_L_conventional']
+    inr_l = s['ethanol_exmill_INR_L'][route] + transport
+    # The priced stream is the TOTAL ethanol-water feed. Convert the ethanol-only Rs/L
+    # quote to USD/kg of total feed by multiplying by the ethanol mass fraction.
+    return (inr_l / s['fx'] / (s['ethanol_density'] / 1000.0)) * s['ethanol_purity_wt']
 
 def h2_price_USD_kg(s):
     return s['h2_INR_kg'][s['h2_route']] / s['fx']
