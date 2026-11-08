@@ -130,7 +130,7 @@ This performs three fresh 1,000-sample runs, saves each replicate's sample table
 The runner writes files under prefinal_results/ by default:
 
 - PNG and PDF versions of the generated figures
-- CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps, plus `sweep_failures.csv` with exception details for any points that required fallback or failed
+- CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps, plus `sweep_failures.csv` with solver exceptions and non-finite points that were retried individually
 - Monte Carlo sample table when the full uncertainty run is enabled
 - `monte_carlo_failed_samples.csv` for failed or non-finite samples; the run manifest records requested, valid and failed counts plus MJSP percentiles
 - Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This uses subsets of one LHS design, not independent replicated LHS convergence proof.
