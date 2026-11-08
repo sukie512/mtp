@@ -103,6 +103,8 @@ print('Unit-level heat-duty and power diagnostics saved to unit_energy_diagnosti
 print(f"\n>>> MJSP = {base['MJSP_USD_gal']:.2f} USD/gal = Rs {base['MJSP_INR_L']:.0f}/L ; SAF = {base['SAF_MMgal_yr']:.2f} MM gal/yr")
 if s_['ethanol_route'] == '2G_cellulosic':
     print('NOTE: 2G ethanol input is a quoted production-cost proxy, not an administered ex-mill price; the transport adder and delivered basis remain unresolved.')
+if s_['h2_route'] == 'green_offsite':
+    print('NOTE: green off-site H2 price is a refinery-gate anchor; transport and delivery to the ATJ plant are not fully costed.')
 
 # ------------------------------------------------------------------ 2 cost breakdown
 head('2. WHERE THE MONEY GOES')
