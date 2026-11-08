@@ -74,7 +74,7 @@ pip install -r requirements.txt
 
 ## Run the model
 
-Run commands from the repository root (the folder containing run_all.py).
+Run commands from the repository root (the folder containing run_all.py). On Windows, `run_prefinal.ps1` performs syntax compilation, tests, the 3,000-sample run, supplementary screens and three independent LHS replicates in sequence.
 
 ### Full analysis — recommended for the thesis run
 
