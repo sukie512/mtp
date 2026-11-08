@@ -137,7 +137,7 @@ Run the pure calculation tests from the repository root:
 pytest -q
 ```
 
-These tests cover ASF distribution normalization, the oligomer-product basis, the C8+ calibration target, the C8–C16 bound check, WDV depreciation and residual value, Monte Carlo setter propagation, coupled reactor/heater/compressor settings, total feed-volume conversion, and elemental-balance diagnostics. They do not replace a full BioSTEAM integration test or validation against experimental plant data.
+These tests cover ASF distribution normalization, the oligomer-product basis, the C8+ calibration target, the C8–C16 bound check, WDV depreciation and residual value, Monte Carlo setter propagation, coupled reactor/heater/compressor settings, total feed-volume conversion, elemental-balance diagnostics, and unit-level energy diagnostics. They do not replace a full BioSTEAM integration test or validation against experimental plant data.
 
 ## Important limitations before using results in a thesis
 
