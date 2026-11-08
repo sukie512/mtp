@@ -191,7 +191,7 @@ fig, ax = plt.subplots(figsize=(9, 5)); b = ax.bar(er.route, er.MJSP_INR_L, colo
 ax.bar_label(b, fmt='%.0f', padding=4); ax.set_ylabel('Minimum jet selling price (INR/L)')
 ax.set_title('Minimum Jet Selling Price by Ethanol Feedstock Route')
 ax.set_xlabel('Ethanol feedstock route'); plt.xticks(rotation=20, ha='right')
-fig.text(0.01, 0.01, 'Caution: 2G cellulosic ethanol uses a production-cost proxy, not an administered ex-mill price; a common transport adder is applied to all routes.', fontsize=8, color='#555555')
+fig.text(0.01, 0.01, 'Caution: 2G cellulosic ethanol uses a production-cost proxy, not an administered ex-mill price; the conventional-route transport proxy is not applied to 2G; 2G delivery cost is excluded and unresolved.', fontsize=8, color='#555555')
 fig.tight_layout(rect=(0, 0.05, 1, 1)); save(fig, '03_ethanol_route_comparison')
 
 # ------------------------------------------------------------------ 5 hydrogen
@@ -275,9 +275,9 @@ if not args.quick:
     ax.set_xlabel('Spearman rank correlation with minimum jet selling price')
     ax.set_title('Sensitivity of Minimum Jet Selling Price to Model Inputs')
     fig.tight_layout(); save(fig, '09_mjsp_sensitivity_ranking')
-    ecol = [c for c in tbl.columns if 'Ethanol ex-mill' in str(c)][0]
+    ecol = [c for c in tbl.columns if 'Ethanol purchase-cost input' in str(c)][0]
     fig, ax = plt.subplots(figsize=(7, 5)); ax.scatter(tbl[ecol].astype(float), y, s=22, alpha=.65, color='#3b8f83', edgecolors='none')
-    ax.set_xlabel('Ethanol ex-mill purchase price (INR/L)'); ax.set_ylabel('Minimum jet selling price (INR/L)')
+    ax.set_xlabel('Ethanol purchase-cost input (INR/L)'); ax.set_ylabel('Minimum jet selling price (INR/L)')
     ax.set_title('Effect of Ethanol Purchase Price on Minimum Jet Selling Price')
     fig.tight_layout(); save(fig, '10_ethanol_price_vs_mjsp')
 
