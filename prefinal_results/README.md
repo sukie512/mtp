@@ -1,8 +1,10 @@
 # Prefinal analysis outputs
 
-This directory is the designated destination for the pre-defence model run.
+This directory is the designated destination for the pre-defence model run. At repository setup time it contains instructions and the validation checklist only; numerical CSVs, plots and Monte Carlo outputs are generated when the run scripts execute.
 
 Generated files are local run artifacts and are not committed automatically. Keep the accompanying `run_manifest.json`, CSV diagnostics, Monte Carlo samples, plots and replicate summaries together. Do not mix these with historical `results/` folders.
+
+On Windows, the full sequence is bundled in `run_prefinal.ps1` (run it from a Python 3.12 virtual environment). Alternatively, use the individual commands below.
 
 Recommended sequence from the repository root:
 
