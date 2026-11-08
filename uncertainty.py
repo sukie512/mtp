@@ -10,8 +10,12 @@ kind='coupled' = changes the process -> flowsheet re-simulated; kind='isolated' 
 import numpy as np, pandas as pd
 import chaospy as shape
 import biosteam as bst
-from .system import apply_prices
-from . import settings as cfg
+try:
+    from .system import apply_prices
+    from . import settings as cfg
+except ImportError:  # support running the repository as a flat script folder
+    from system import apply_prices
+    import settings as cfg
 
 def build_model(sys, tea, F, s, MJSP_stream='SAF'):
     model = bst.Model(sys)
@@ -66,7 +70,10 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
     return model
 
 def run_mc(N=300, seed=1234, **override):
-    from .analysis import run
+    try:
+        from .analysis import run
+    except ImportError:  # support flat-folder execution
+        from analysis import run
     sys, tea, F, s = run(**override)
     model = build_model(sys, tea, F, s)
     samples = model.sample(N, rule='L', seed=seed)
