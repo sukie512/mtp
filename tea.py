@@ -11,11 +11,26 @@ Capital-cost build-up fractions are the Humbird et al. 2011 (NREL/TP-5100-47764)
 import numpy as np
 import biosteam as bst
 
+
+def wdv_depreciation_fractions(rate, years):
+    """Return annual fractions for a declining-balance WDV proxy.
+
+    Fractions are relative to original depreciable basis. They are deliberately
+    not normalized to sum to one: the residual book fraction remains after the
+    finite project horizon.
+    """
+    if not 0.0 < rate < 1.0:
+        raise ValueError("WDV rate must be between 0 and 1")
+    if int(years) != years or years <= 0:
+        raise ValueError("years must be a positive integer")
+    return np.array([rate * (1.0 - rate) ** t for t in range(int(years))])
+
+
 class IndiaTEA(bst.TEA):
     def __init__(self, system, s, **kw):
         n = s['duration'][1] - s['duration'][0]
         r = s['wdv_rate']
-        dep = np.array([r * (1 - r) ** t for t in range(n)])
+        dep = wdv_depreciation_fractions(r, n)
         # Do not normalize: WDV leaves a residual book fraction after the project horizon.
         # This is still a simplified tax proxy: the model does not split depreciable asset blocks
         # or model terminal disposal proceeds / tax recapture.
