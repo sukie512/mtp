@@ -11,10 +11,10 @@ import numpy as np
 import biosteam as bst
 
 try:
-    from .asf_model import weight_fractions, alpha_from_T_P, calibrate_beta0, conversion
+    from .asf_model import oligomer_weight_fractions, alpha_from_T_P, calibrate_beta0, conversion
     from .atj_chemicals import OLEFINS, PARAFFINS
 except ImportError:
-    from asf_model import weight_fractions, alpha_from_T_P, calibrate_beta0, conversion
+    from asf_model import oligomer_weight_fractions, alpha_from_T_P, calibrate_beta0, conversion
     from atj_chemicals import OLEFINS, PARAFFINS
 
 def vessel_purchase_cost(V_m3, P_Pa, LD=3.0, sigma=15000., E=0.85):
@@ -101,11 +101,11 @@ class ASFOligomerizer(CatalystReactor):
             w = np.zeros(9)
             for k, frac in self.FIXED_SPLIT.items(): w[k - 1] = frac
         else:
-            w = weight_fractions(self.alpha); w = np.r_[w[:8], w[8:].sum()]   # lump k>=9 into C18
+            w = oligomer_weight_fractions(self.alpha); w = np.r_[w[:8], w[8:].sum()]   # lump k>=9 into C18
         n0 = feed.imol['Ethylene']
         self.X_avg, self.w = X, w
         for k in range(2, 10):
-            nc = n0 * X * w[k - 1]                      # mol ethylene -> k-mer (weight fraction == mole-of-C2 fraction)
+            nc = n0 * X * w[k - 1]                      # total converted ethylene is distributed over k >= 2 products
             out.imol['Ethylene'] -= nc
             out.imol[OLEFINS[k]] += nc / k
 
