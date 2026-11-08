@@ -35,14 +35,46 @@ def run(s=None, **overrides):
     return sys, tea, F, s
 
 
-def elemental_balance_errors(sys, elements=('C', 'H', 'O')):
-    """Return global elemental imbalance percentages across external feeds and products.
+CATALYST_MAKEUP_IDS = {'Cat_dehyd', 'Cat_olig', 'Cat_hydgn'}
 
-    Positive values mean net accumulation at the outputs; negative values mean
-    an apparent loss. This is a diagnostic, not a substitute for unit-by-unit
-    reaction and stream-balance checks.
+
+def process_material_feeds(sys):
+    """External process feeds, excluding catalyst make-up inventory streams.
+
+    Catalyst make-up is currently costed as a feed stream but spent catalyst is
+    not represented as a product stream. Including it in a process balance
+    would therefore report a false mass/element loss. The excluded catalyst
+    flow is reported separately by process_mass_balance_diagnostics().
     """
-    feeds = tuple(sys.feeds)
+    return tuple(stream for stream in sys.feeds if stream.ID not in CATALYST_MAKEUP_IDS)
+
+
+def process_mass_balance_diagnostics(sys):
+    """Return process-only mass closure and the separately excluded catalyst make-up rate."""
+    feeds = process_material_feeds(sys)
+    products = tuple(sys.products)
+    inlet = sum(stream.F_mass for stream in feeds)
+    outlet = sum(stream.F_mass for stream in products)
+    catalyst_makeup = sum(
+        stream.F_mass for stream in sys.feeds if stream.ID in CATALYST_MAKEUP_IDS
+    )
+    return {
+        'process_mass_balance_error_pct': (
+            (outlet - inlet) / inlet * 100.0 if inlet else np.nan
+        ),
+        'catalyst_makeup_kg_hr_excluded': catalyst_makeup,
+    }
+
+
+def elemental_balance_errors(sys, elements=('C', 'H', 'O')):
+    """Return process-only elemental imbalance percentages across feeds and products.
+
+    Catalyst make-up streams are excluded because the current flowsheet costs
+    their replacement but does not model spent-catalyst discharge. Positive
+    values mean net accumulation at the outputs; negative values mean an
+    apparent loss. This is a diagnostic, not a substitute for unit balances.
+    """
+    feeds = process_material_feeds(sys)
     products = tuple(sys.products)
     errors = {}
     for element in elements:
@@ -91,8 +123,7 @@ def results(sys, tea, F, s):
                 installed_MM_USD=tea.installed_equipment_cost / 1e6, FCI_MM_USD=tea.FCI / 1e6,
                 FOC_MM_USD_yr=tea.FOC / 1e6, VOC_MM_USD_yr=tea.VOC / 1e6, sales_MM_USD_yr=tea.sales / 1e6,
                 ethanol_cost_share=st.Ethanol_In.cost * hrs / (tea.VOC + tea.FOC),
-                mass_balance_pct=(sum(x.F_mass for x in sys.feeds) - sum(x.F_mass for x in sys.products))
-                                  / sum(x.F_mass for x in sys.feeds) * 100,
+                **process_mass_balance_diagnostics(sys),
                 **elemental_balance_errors(sys))
 
 
