@@ -98,6 +98,7 @@ The runner writes files under new_results/ by default:
 - PNG and PDF versions of the generated figures
 - CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps
 - Monte Carlo sample table when the full uncertainty run is enabled
+- Prefix-based percentile stability diagnostic at available checkpoints (250, 500, 1,000, 2,000 and the final valid sample count). This is an empirical diagnostic using subsets of one LHS design, not independent replicated LHS convergence proof.
 
 The runner reports the number of converged Monte Carlo samples and MJSP percentiles. Check that count before interpreting the distribution; failed samples are excluded from the reported percentile calculation. Preserve the terminal log with the output folder so the run can be reproduced and reviewed.
 
@@ -115,7 +116,7 @@ The temperature-sensitivity parameter dE remains unresolved unless fitted from s
 - **Isolated parameters** change economics without changing material flows.
 - Labour cost and loan interest setters update the live TEA object as well as the settings dictionary.
 - The distributions and ranges in uncertainty.py are not all empirical probability distributions. Several are judgement-based ranges or placeholders and must be supported with citations or clearly presented as scenario assumptions.
-- A 3,000-sample run is a starting point, not proof of convergence. Compare results at increasing sample counts and report convergence evidence.
+- A 3,000-sample run is a starting point, not proof of convergence. The runner now reports a prefix-based percentile stability diagnostic; for a stronger convergence claim, also run independent LHS replicates at increasing sample counts and compare the resulting quantiles and rank correlations.
 
 ## Tests
 
