@@ -34,7 +34,7 @@ S = dict(
     # feedstock class with different capital/LCA implications. Run validate_paper.py (US inputs) for paper
     # comparison; use '2G_cellulosic' as the route when the thesis claim is specifically about the paper's pathway.
     ethanol_purity_wt=0.995,      # [REPO] feed_parameters['purity'] -- mass fraction of the TOTAL ethanol_KLPD stream (system.py splits it as Ethanol=eth*purity, Water=eth*(1-purity); FIXED Oct 2026, previously double-counted ~0.5% high)
-    ethanol_density=789.0,        # kg/m3, [REPO] (Humbird 2011)
+    ethanol_density=789.0,        # kg/m3 pure ethanol, [REPO] (Humbird 2011); total-feed density is estimated by additive specific volumes below
     # ------------------------------------------------------------------ ethanol feedstock price
     # Administered ex-mill prices, Rs/litre, ESY 2025-26 (1 Nov 2025 - 31 Oct 2026). [VERIFIED-26]
     #  sources: dataful.in/datasets/21605 (MoPNG series); bioenergytimes.com (Jul 2026, MoS Petroleum written reply);
@@ -115,8 +115,21 @@ def get():
     return copy.deepcopy(S)
 
 # ---- unit helpers --------------------------------------------------------
+def ethanol_feed_density(s):
+    """Approximate total feed density from ethanol/water mass fractions.
+
+    Uses additive specific volumes (ideal-volume approximation); replace with
+    a validated mixture density if the feed is materially more dilute.
+    """
+    w = s['ethanol_purity_wt']
+    rho_ethanol = s['ethanol_density']
+    rho_water = 998.2  # kg/m3, near ambient liquid water
+    return 1.0 / (w / rho_ethanol + (1.0 - w) / rho_water)
+
+
 def ethanol_kg_hr(s):
-    return s['ethanol_KLPD'] * s['ethanol_density'] / 24.0          # KL/day -> kg/hr  (1 KL = 1 m3)
+    # KLPD is total ethanol-water feed volume, not pure-ethanol-equivalent volume.
+    return s['ethanol_KLPD'] * ethanol_feed_density(s) / 24.0
 
 def ethanol_price_USD_kg(s):
     inr_l = s['ethanol_exmill_INR_L'][s['ethanol_route']] + s['ethanol_transport_INR_L']
