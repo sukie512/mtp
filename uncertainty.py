@@ -97,8 +97,8 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
         st.Ethanol_In, shape.Triangle(0.9 * base, base, 1.15 * base), 'isolated', 'INR/L')  # scenario uncertainty around route-specific input
 
     h2 = s['h2_INR_kg'][s['h2_route']]
-    add('Hydrogen delivered price', sset('h2_INR_kg', s['h2_route']),
-        st.Hydrogen_In, shape.Triangle(0.77 * h2, h2, 1.27 * h2), 'isolated', 'INR/kg')  # includes a judgement delivery allowance; not a plant-gate quote
+    add('Hydrogen refinery-gate price (delivery excluded)', sset('h2_INR_kg', s['h2_route']),
+        st.Hydrogen_In, shape.Triangle(0.77 * h2, h2, 1.27 * h2), 'isolated', 'INR/kg')  # refinery-gate price uncertainty only; off-site delivery cost is not separately represented
 
     add('Naphtha (RN) price', sset('rn_USD_kg'), st.RN,
         shape.Uniform(0.60, 1.17), 'isolated', 'USD/kg')  # India 2026 price range; source references in settings.py
