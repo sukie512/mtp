@@ -82,7 +82,7 @@ This runs the deterministic cases and saves the figures/tables without opening p
 For the full uncertainty run:
 
 ```bash
-python run_all.py --n 3000 --no-show
+python run_all.py --n 3000 --seed 1234 --no-show
 ```
 
 The figures are written to `new_results/` by default as high-resolution PNG and PDF files; tables are exported as CSV. Use `--out another_folder` to select a different output directory. The full Monte Carlo runtime depends on the machine and convergence behaviour.
