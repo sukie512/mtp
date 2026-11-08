@@ -70,6 +70,7 @@ def max_c8_c16_share(kmax=200):
     mixture of ASF populations is a convex combination, so it cannot exceed
     the maximum attainable by a single population. The returned value is a
     grid estimate, not a formal analytic proof of the exact maximum.
+    """
     alphas = np.linspace(0.001, 0.999, 2000)
     vals = [oligomer_weight_fractions(a, kmax)[3:8].sum() for a in alphas]
     i = int(np.argmax(vals))
