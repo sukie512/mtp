@@ -35,6 +35,25 @@ def run(s=None, **overrides):
     return sys, tea, F, s
 
 
+def elemental_balance_errors(sys, elements=('C', 'H', 'O')):
+    """Return global elemental imbalance percentages across external feeds and products.
+
+    Positive values mean net accumulation at the outputs; negative values mean
+    an apparent loss. This is a diagnostic, not a substitute for unit-by-unit
+    reaction and stream-balance checks.
+    """
+    feeds = tuple(sys.feeds)
+    products = tuple(sys.products)
+    errors = {}
+    for element in elements:
+        inlet = sum(stream.get_atomic_flow(element) for stream in feeds)
+        outlet = sum(stream.get_atomic_flow(element) for stream in products)
+        errors[f'{element}_balance_error_pct'] = (
+            (outlet - inlet) / inlet * 100.0 if inlet else np.nan
+        )
+    return errors
+
+
 def results(sys, tea, F, s):
     """One-row summary. Units: USD/gal and INR/L for MJSP; H2 intensity computed correctly (kg H2 per tonne of fuel)."""
     st = F.stream
@@ -52,7 +71,8 @@ def results(sys, tea, F, s):
                 FOC_MM_USD_yr=tea.FOC / 1e6, VOC_MM_USD_yr=tea.VOC / 1e6, sales_MM_USD_yr=tea.sales / 1e6,
                 ethanol_cost_share=st.Ethanol_In.cost * hrs / (tea.VOC + tea.FOC),
                 mass_balance_pct=(sum(x.F_mass for x in sys.feeds) - sum(x.F_mass for x in sys.products))
-                                  / sum(x.F_mass for x in sys.feeds) * 100)
+                                  / sum(x.F_mass for x in sys.feeds) * 100,
+                **elemental_balance_errors(sys))
 
 
 def baseline():
