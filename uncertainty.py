@@ -93,7 +93,7 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
 
     route = s['ethanol_route']
     base = s['ethanol_exmill_INR_L'][route]
-    add('Ethanol ex-mill price', sset('ethanol_exmill_INR_L', route),
+    add('Ethanol purchase-cost input', sset('ethanol_exmill_INR_L', route),
         st.Ethanol_In, shape.Triangle(0.9 * base, base, 1.15 * base), 'isolated', 'INR/L')  # scenario uncertainty around route-specific input
 
     h2 = s['h2_INR_kg'][s['h2_route']]
