@@ -40,12 +40,22 @@ from asf_model import oligomer_weight_fractions, alpha_from_T_P, calibrate_beta0
 
 import uncertainty as U
 
+SWEEP_FAILURES = []
+
+
 def safe(sweep_fn, fallback_rows, label):
-    """Call YOUR sweep function. If one operating point crashes the BioSTEAM column solver (e.g. 373 K / 45 bar in
-    sweep_T_P), redo that sweep point-by-point with A.run + A.results and skip only the bad points."""
+    """Run a sweep, retrying point-by-point if a combined sweep fails.
+
+    Failed operating points are retained as NaN rows and their exception
+    details are exported to sweep_failures.csv; they are never silently hidden.
+    """
     try:
         return sweep_fn()
     except Exception as e:
+        SWEEP_FAILURES.append({
+            'sweep': label, 'case': 'combined_sweep',
+            'error_type': type(e).__name__, 'error': str(e),
+        })
         print(f'   note: {label} hit a solver failure ({str(e)[:70]}...); re-running point by point, bad points -> NaN', flush=True)
         rows = []
         result_columns = None
@@ -54,7 +64,11 @@ def safe(sweep_fn, fallback_rows, label):
                 row = A.results(*A.run(**kw))
                 result_columns = list(row)
                 rows.append(dict(extra, **row))
-            except Exception:
+            except Exception as point_error:
+                SWEEP_FAILURES.append({
+                    'sweep': label, 'case': repr(extra),
+                    'error_type': type(point_error).__name__, 'error': str(point_error),
+                })
                 # Determine the output schema at most once; do not rerun the baseline for every failed point.
                 if result_columns is None:
                     try: result_columns = list(A.results(*A.run()))
@@ -261,6 +275,16 @@ if not args.quick:
     ax.set_xlabel('Ethanol ex-mill purchase price (INR/L)'); ax.set_ylabel('Minimum jet selling price (INR/L)')
     ax.set_title('Effect of Ethanol Purchase Price on Minimum Jet Selling Price')
     fig.tight_layout(); save(fig, '10_ethanol_price_vs_mjsp')
+
+# Preserve solver failures from deterministic sweeps, including point-specific exceptions.
+failure_columns = ['sweep', 'case', 'error_type', 'error']
+pd.DataFrame(SWEEP_FAILURES, columns=failure_columns).to_csv(
+    _free_path('sweep_failures', '.csv'), index=False
+)
+if SWEEP_FAILURES:
+    print(f"\nWARNING: {len(SWEEP_FAILURES)} sweep failure record(s) saved to sweep_failures.csv")
+else:
+    print("\nAll deterministic sweep points completed without fallback failures.")
 
 # Save enough run metadata to make a result folder interpretable later.
 try:
