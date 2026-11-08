@@ -65,7 +65,7 @@ These are not cosmetic issues. They can change the reported MJSP, selectivity or
 7. **Equipment cost correlations:** the pressure-vessel correlation in `units.py` is explicitly marked as requiring verification against the cited source. Verify vessel sizing, design pressure, wall thickness, material, CEPCI basis and purchase/installed-cost treatment before treating FCI as final.
 8. **Capacity basis:** confirm whether KLPD means ethanol volume or total ethanol-water feed volume. The current mass-flow helper uses ethanol density; the model basis and density conversion must agree.
 9. **Uncertainty distributions:** several bounds are judgement-based or marked unresolved in the source comments. Keep them as scenario ranges, not empirical confidence intervals, until supported by traceable data.
-10. **Independent validation:** run elemental balances (C/H/O), stream mass balances, energy-duty checks and selected unit tests against hand calculations and literature data. A successful BioSTEAM simulation alone does not validate the process model.
+10. **Independent validation:** `analysis.results()` now reports global C/H/O balance errors from external feeds and products, in addition to the overall mass-balance error. These are diagnostics, not proof of unit-level correctness. Still inspect unit-level reaction balances, energy duties, equipment sizing and selected hand calculations/literature comparisons. A successful BioSTEAM simulation alone does not validate the process model.
 
 ## Running the updated analysis
 
