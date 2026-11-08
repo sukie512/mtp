@@ -51,10 +51,12 @@ def main():
     rows = []
     for days in args.storage_days:
         print(f"Simulating hydrogen storage duration: {days:g} days", flush=True)
-        result = A.results(*A.run(h2_storage_days=days))
+        sys, tea, flowsheet, settings = A.run(h2_storage_days=days)
+        result = A.results(sys, tea, flowsheet, settings)
         rows.append({
             "H2_storage_days": days,
             "MJSP_INR_L": result["MJSP_INR_L"],
+            "H2_storage_tank_installed_cost_USD": flowsheet.unit.T102.installed_cost,
             "installed_equipment_MM_USD": result["installed_MM_USD"],
             "FCI_MM_USD": result["FCI_MM_USD"],
             "SAF_MMgal_yr": result["SAF_MMgal_yr"],
@@ -65,9 +67,9 @@ def main():
     print("\nHydrogen storage-days sensitivity:")
     print(storage.round(3).to_string(index=False))
 
-    baseline = storage.iloc[(storage["H2_storage_days"] - 7.0).abs().argsort()[:1]].iloc[0]
+    baseline_result = A.results(*A.run())
     parity = price_parity_screen(
-        baseline["MJSP_INR_L"], cfg.S["fossil_atf_INR_L"]
+        baseline_result["MJSP_INR_L"], cfg.S["fossil_atf_INR_L"]
     )
     parity.update({
         "benchmark_basis_note": (
