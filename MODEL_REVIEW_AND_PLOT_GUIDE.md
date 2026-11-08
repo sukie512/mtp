@@ -85,7 +85,7 @@ For the full uncertainty run:
 python run_all.py --n 3000 --seed 1234 --no-show
 ```
 
-The figures are written to `new_results/` by default as high-resolution PNG and PDF files; tables are exported as CSV. Use `--out another_folder` to select a different output directory. The full Monte Carlo runtime depends on the machine and convergence behaviour.
+The figures are written to `prefinal_results/` by default as high-resolution PNG and PDF files; tables are exported as CSV. Use `--out another_folder` to select a different output directory. The full Monte Carlo runtime depends on the machine and convergence behaviour.
 
 ## Validation status
 
@@ -102,7 +102,7 @@ The script `additional_sensitivities.py` adds two small analyses outside the mai
 Run from the repository root:
 
 ```powershell
-python additional_sensitivities.py --out new_results
+python additional_sensitivities.py --out prefinal_results
 ```
 
 The pressure-coupling test already exists and confirms that K202, D202 and R202 move together. It should not be re-implemented.
