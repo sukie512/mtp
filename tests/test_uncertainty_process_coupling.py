@@ -19,8 +19,10 @@ def test_temperature_parameter_updates_heater_and_reactor():
 def test_pressure_parameter_updates_compressor_and_reactor():
     units = SimpleNamespace(
         K202=SimpleNamespace(P=35e5),
+        D202=SimpleNamespace(P=35e5),
         R202=SimpleNamespace(P=35e5),
     )
     set_oligomerization_pressure(units, 40e5)
     assert units.K202.P == 40e5
+    assert units.D202.P == 40e5
     assert units.R202.P == 40e5
