@@ -34,5 +34,8 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
+      - name: Compile Python modules
+        run: python -m compileall -q .
+
       - name: Run unit tests
         run: python -m pytest -q
