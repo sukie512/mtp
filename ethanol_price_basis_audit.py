@@ -74,7 +74,8 @@ def main():
         "case", "ethanol_input_INR_L", "MJSP_INR_L",
         "ethanol_feed_cost_INR_L_SAF", "hydrogen_feed_cost_INR_L_SAF",
         "total_coproduct_credit_INR_L_SAF", "annual_VOC_INR_L_SAF",
-        "annual_FOC_INR_L_SAF", "ethanol_to_SAF_volume_ratio",
+        "annual_FOC_INR_L_SAF", "capital_tax_finance_return_residual_INR_L_SAF",
+        "ethanol_to_SAF_volume_ratio",
         "SAF_MMgal_yr", "FCI_MM_USD",
     ]
     print(f"\nSaved price-basis audit: {output.resolve()}")
