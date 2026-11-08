@@ -16,7 +16,10 @@ Sources for every input are in the comments of settings.py (tags: VERIFIED-26 / 
 import argparse, os, sys, time, warnings, json, platform, subprocess
 # Keep scientific warnings visible; suppress only known noisy categories locally if needed.
 ap = argparse.ArgumentParser()
-ap.add_argument('--n', type=int, default=3000, help='Number of Latin-hypercube samples (default: 3000)')\nap.add_argument('--seed', type=int, default=1234, help='Random seed for reproducible sampling (default: 1234)')\nap.add_argument('--no-show', action='store_true'); ap.add_argument('--quick', action='store_true')
+ap.add_argument('--n', type=int, default=3000, help='Number of Latin-hypercube samples (default: 3000)')
+ap.add_argument('--seed', type=int, default=1234, help='Random seed for reproducible sampling (default: 1234)')
+ap.add_argument('--no-show', action='store_true')
+ap.add_argument('--quick', action='store_true')
 ap.add_argument('--out', default='new_results', help='Output folder for tables and plots (default: new_results)')
 args = ap.parse_args()
 if not args.quick and args.n < 2:
