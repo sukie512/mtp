@@ -9,7 +9,7 @@ A BioSTEAM-based process and techno-economic model for converting ethanol to sus
 The default settings are configured for:
 
 - **Ethanol route:** 2G_cellulosic (lignocellulosic / second-generation ethanol)
-- **Plant capacity:** 200 KLPD on the model's stated total ethanol-plus-water feed-volume basis
+- **Plant capacity:** 200 KLPD on the model's stated total ethanol-plus-water feed-volume basis (mass flow uses an additive-specific-volume density approximation)
 - **Hydrogen route:** green_offsite
 - **Finance:** India-specific settings in settings.py
 - **Oligomerization:** temperature- and pressure-dependent ASF chain-growth model
@@ -137,7 +137,7 @@ These tests cover ASF distribution normalization, the oligomer-product basis, th
 5. **Catalyst deactivation:** cycle-average activity decay and catalyst replacement lifetime are separate assumptions.
 6. **Depreciation:** the TEA uses a simplified WDV-shaped proxy. It does not split tax asset blocks or model terminal disposal proceeds / tax recapture.
 7. **Equipment costs:** the pressure-vessel cost correlation is explicitly marked in units.py as requiring verification against its source. Some equipment correlations may be outside their stated ranges.
-8. **Capacity basis:** confirm the KLPD definition and volume-to-mass conversion before reporting plant capacity.
+8. **Capacity basis:** KLPD is treated as total ethanol-water feed volume. The mass conversion now estimates mixture density using additive specific volumes; validate this against a rigorous ethanol-water mixture property calculation before reporting capacity.
 9. **Independent validation:** complete carbon, hydrogen and oxygen balances, stream mass balances, energy-duty checks, unit checks and selected comparisons against literature or independently calculated values.
 10. **Runtime status:** a successful BioSTEAM simulation is not, by itself, process validation. Do not report new numerical results as verified until the current branch has been run locally and its logs, warnings, convergence and balances have been reviewed.
 
