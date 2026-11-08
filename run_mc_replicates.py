@@ -82,7 +82,7 @@ def main():
 
     for i in range(args.replicates):
         seed = args.seed + i
-        print(f"\\nReplicate {i + 1}/{args.replicates}: N={args.n}, seed={seed}", flush=True)
+        print(f"\nReplicate {i + 1}/{args.replicates}: N={args.n}, seed={seed}", flush=True)
         model = U.run_mc(N=args.n, seed=seed)
         table = model.table.copy()
         columns = [column for column in table.columns
@@ -168,14 +168,14 @@ def main():
                           "spearman_rank_agreement": rho, "shared_parameters": len(paired)})
     pd.DataFrame(rank_rows).to_csv(out / "mc_sensitivity_rank_agreement.csv", index=False)
 
-    print(f"\\nIndependent-replicate summary saved under: {out.resolve()}")
+    print(f"\nIndependent-replicate summary saved under: {out.resolve()}")
     print(summary.round(3).to_string(index=False))
-    print("\\nAcross-replicate quantile stability (spread relative to replicate mean):")
+    print("\nAcross-replicate quantile stability (spread relative to replicate mean):")
     print(stability.round(3).to_string(index=False))
-    print("\\nSensitivity-rank agreement:")
+    print("\nSensitivity-rank agreement:")
     print(pd.DataFrame(rank_rows).round(3).to_string(index=False))
     print(
-        "\\nInterpretation: compare replicate quantiles and sensitivity ranks. "
+        "\nInterpretation: compare replicate quantiles and sensitivity ranks. "
         "These diagnostics measure sampling stability conditional on the chosen "
         "input distributions; they do not validate those distributions or model structure."
     )
