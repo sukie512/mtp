@@ -1,6 +1,6 @@
 """
 run_all.py  --  RUN THIS FILE.  It calls the model files, prints every result table in the terminal,
-saves every chart as PNG and PDF in the selected output folder (default: ./prefinal_results/) and (unless --no-show) opens charts at the end.
+saves every chart as PNG and PDF in the selected output folder (default: ./prefinal_results1/) and (unless --no-show) opens charts at the end.
 
     python run_all.py              # 3000 Latin-hypercube samples (full analysis)
     python run_all.py --n 3000    # explicitly set the Monte Carlo sample count
@@ -20,7 +20,7 @@ ap.add_argument('--n', type=int, default=3000, help='Number of Latin-hypercube s
 ap.add_argument('--seed', type=int, default=1234, help='Random seed for reproducible sampling (default: 1234)')
 ap.add_argument('--no-show', action='store_true')
 ap.add_argument('--quick', action='store_true')
-ap.add_argument('--out', default='prefinal_results', help='Output folder for tables and plots (default: prefinal_results)')
+ap.add_argument('--out', default='prefinal_results1', help='Output folder for tables and plots (default: prefinal_results1)')
 args = ap.parse_args()
 if not args.quick and args.n < 2:
     ap.error('--n must be at least 2 for a Monte Carlo run')
