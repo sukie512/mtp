@@ -123,7 +123,15 @@ The prefix-based diagnostic above uses subsets of one LHS design. For a stronger
 python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out prefinal_results/replicates
 ```
 
-This performs three fresh 1,000-sample runs, saves each replicate's sample table, and writes `mc_replicate_summary.csv` with valid/failed counts, mean, standard deviation and P5/P50/P95 MJSP. Compare the replicate quantiles and failure fractions; large differences indicate that the uncertainty estimates are not yet stable. This is a diagnostic, not a guarantee of convergence.
+This performs three fresh 1,000-sample runs with distinct seeds. It excludes NaN and both positive/negative infinity from the valid MJSP distribution, saves non-finite rows separately for each replicate, and writes:
+- `mc_replicate_summary.csv`: valid/failed counts, mean, standard deviation and P5/P25/P50/P75/P95 MJSP
+- `mc_replicate_stability.csv`: across-replicate spread of the mean and quantiles, including spread as a percentage of the replicate mean
+- `mc_replicate_XX_spearman.csv`: input-versus-MJSP Spearman correlations for each replicate
+- `mc_sensitivity_replicate_comparison.csv`: side-by-side sensitivity coefficients and their cross-replicate averages/spread
+- `mc_sensitivity_rank_agreement.csv`: pairwise agreement between replicate sensitivity rankings
+- `mc_replicate_XX_failed_samples.csv`: failed or non-finite sample rows for audit
+
+Compare both the MJSP quantiles and sensitivity rankings. Stable percentiles with unstable rankings still mean the sensitivity conclusions are not robust. These checks assess sampling stability conditional on the selected input distributions; they do not validate the distributions, independence assumptions, or process model.
 
 ## Outputs
 
