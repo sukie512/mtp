@@ -18,7 +18,7 @@ def test_price_parity_screen_reports_parity_or_lower():
 
 @pytest.mark.parametrize(
     "mjsp, benchmark",
-    [(-1.0, 100.0), (100.0, 0.0), (100.0, -1.0)],
+    [(-1.0, 100.0), (100.0, 0.0), (100.0, -1.0), (float("nan"), 100.0), (100.0, float("inf"))],
 )
 def test_price_parity_screen_rejects_invalid_prices(mjsp, benchmark):
     with pytest.raises(ValueError):
