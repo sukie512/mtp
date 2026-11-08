@@ -37,6 +37,18 @@ def make_setting_setter(s, F, tea, key, sub=None, tea_attribute=None):
     return setter
 
 
+def set_oligomerization_temperature(units, value):
+    """Keep oligomerization reactor and its upstream heater at the sampled temperature."""
+    units.H203.T = float(value)
+    units.R202.T = float(value)
+
+
+def set_oligomerization_pressure(units, value):
+    """Keep the ethylene compressor discharge and oligomerization reactor at sampled pressure."""
+    units.K202.P = float(value)
+    units.R202.P = float(value)
+
+
 def build_model(sys, tea, F, s, MJSP_stream='SAF'):
     model = bst.Model(sys)
     st, U = F.stream, F.unit
@@ -46,9 +58,9 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
         P(setter, element=element, name=name, distribution=dist, kind=kind, units=units)
 
     # ---------- process (coupled) ----------
-    add('Oligomerization T', lambda v: setattr(U.R202, 'T', v), U.R202,
+    add('Oligomerization T', lambda v: set_oligomerization_temperature(U, v), U.R202,
         shape.Triangle(373.15, 393.15, 413.15), 'coupled', 'K')
-    add('Oligomerization P', lambda v: setattr(U.R202, 'P', v), U.R202,
+    add('Oligomerization P', lambda v: set_oligomerization_pressure(U, v), U.R202,
         shape.Triangle(30e5, 35e5, 40e5), 'coupled', 'Pa')
     add('ASF dE (Eterm-Eprop)', lambda v: setattr(U.R202, 'dE', v), U.R202,
         shape.Uniform(5e3, 30e3), 'coupled', 'J/mol')
