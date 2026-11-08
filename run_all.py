@@ -17,6 +17,7 @@ import argparse, os, sys, time, warnings
 # Keep scientific warnings visible; suppress only known noisy categories locally if needed.
 ap = argparse.ArgumentParser()
 ap.add_argument('--n', type=int, default=100); ap.add_argument('--no-show', action='store_true'); ap.add_argument('--quick', action='store_true')
+ap.add_argument('--out', default='new_results', help='Output folder for tables and plots (default: new_results)')
 args = ap.parse_args()
 
 import matplotlib
@@ -32,7 +33,7 @@ plt.rcParams.update({
     'axes.spines.top': False, 'axes.spines.right': False,
     'lines.linewidth': 2.0, 'lines.markersize': 6,
 })
-HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, 'results'); os.makedirs(OUT, exist_ok=True)
+HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, args.out); os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, HERE)
 import settings as cfg, analysis as A
 from asf_model import weight_fractions, alpha_from_T_P, calibrate_beta0
@@ -235,7 +236,7 @@ if not args.quick:
     ax.set_title('Effect of Ethanol Purchase Price on Minimum Jet Selling Price')
     fig.tight_layout(); save(fig, '10_ethanol_price_vs_mjsp')
 
-head(f'DONE in {(time.time() - T0) / 60:.1f} min. Tables (csv) and charts (png) are in: {OUT}')
+head(f'DONE in {(time.time() - T0) / 60:.1f} min. Tables (csv) and charts (png/pdf) are in: {OUT}')
 if not args.no_show:
     try:
         plt.show()
