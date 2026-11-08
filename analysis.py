@@ -56,7 +56,7 @@ def process_mass_balance_diagnostics(sys):
     inlet = sum(stream.F_mass for stream in feeds)
     outlet = sum(stream.F_mass for stream in products)
     catalyst_makeup = sum(
-        stream.F_mass for stream in sys.feeds if stream.ID in CATALYST_MAKEUP_IDS
+        stream.F_mass for stream in sys.feeds if getattr(stream, 'ID', None) in CATALYST_MAKEUP_IDS
     )
     return {
         'process_mass_balance_error_pct': (
