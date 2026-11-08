@@ -5,9 +5,9 @@ from scipy.optimize import brentq
 R = 8.314  # J/mol/K
 
 def weight_fractions(alpha, kmax=60):
-    """Weight fraction of each k-mer (k ethylene units, carbon number 2k), as fraction of
-    CONVERTED ethylene mass. ASF: mole fraction n_k = (1-a) a^(k-1); mass ∝ k*n_k,
-    so w_k = k (1-a)^2 a^(k-1). Returns array index 0 -> k=1 (C2, i.e. butene is index 1)."""
+    """Weight fraction of each k-mer (k ethylene units, carbon number 2k), as fraction of the ASF distribution.
+    ASF: mole fraction n_k = (1-a) a^(k-1); mass is proportional to k*n_k,
+    so w_k = k (1-a)^2 a^(k-1). Array index 0 is k=1 (C2/ethylene); index 1 is k=2 (C4/butene)."""
     if not 0.0 < alpha < 1.0:
         raise ValueError('alpha must lie strictly between 0 and 1')
     k = np.arange(1, kmax + 1)
