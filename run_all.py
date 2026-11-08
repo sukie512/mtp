@@ -4,7 +4,7 @@ saves every chart as PNG and PDF in the selected output folder (default: ./new_r
 
     python run_all.py              # 3000 Latin-hypercube samples (full analysis)
     python run_all.py --n 3000    # explicitly set the Monte Carlo sample count
-    python run_all.py --no-show    # only save PNGs (no windows)
+    python run_all.py --no-show    # save PNG and PDF files without opening plot windows
     python run_all.py --quick      # skip Monte Carlo (about 3 min)
 
 Works with YOUR original files, unchanged, in the SAME folder:
@@ -13,10 +13,10 @@ It only calls functions that exist there: analysis.run / results / baseline / sw
 sweep_scale / sweep_T_P / sweep_deactivation ; uncertainty.run_mc / summarize ; asf_model.* ; settings.S
 Sources for every input are in the comments of settings.py (tags: VERIFIED-26 / REPO / PLACEHOLDER).
 """
-import argparse, os, sys, time, warnings
+import argparse, os, sys, time, warnings, json, platform, subprocess
 # Keep scientific warnings visible; suppress only known noisy categories locally if needed.
 ap = argparse.ArgumentParser()
-ap.add_argument('--n', type=int, default=3000); ap.add_argument('--no-show', action='store_true'); ap.add_argument('--quick', action='store_true')
+ap.add_argument('--n', type=int, default=3000, help='Number of Latin-hypercube samples (default: 3000)')\nap.add_argument('--seed', type=int, default=1234, help='Random seed for reproducible sampling (default: 1234)')\nap.add_argument('--no-show', action='store_true'); ap.add_argument('--quick', action='store_true')
 ap.add_argument('--out', default='new_results', help='Output folder for tables and plots (default: new_results)')
 args = ap.parse_args()
 
@@ -218,7 +218,7 @@ fig.tight_layout(); save(fig, '07_catalyst_deactivation_sensitivity')
 # ------------------------------------------------------------------ 9 Monte Carlo
 if not args.quick:
     head(f'9. MONTE CARLO: {args.n} Latin-hypercube samples')
-    m = U.run_mc(N=args.n); tbl = m.table
+    m = U.run_mc(N=args.n, seed=args.seed); tbl = m.table
     col = [c for c in tbl.columns if 'MJSP' in str(c) and 'INR' in str(c)][0]
     tbl = tbl.dropna(subset=[col]); y = tbl[col].astype(float); print(f'{len(y)} of {args.n} samples converged')
     q = y.quantile([.05, .25, .5, .75, .95]); print('MJSP percentiles [Rs/L]:'); print(q.round(1).to_string()); print('Baseline:', round(base['MJSP_INR_L'], 1))
@@ -260,7 +260,48 @@ if not args.quick:
     ax.set_title('Effect of Ethanol Purchase Price on Minimum Jet Selling Price')
     fig.tight_layout(); save(fig, '10_ethanol_price_vs_mjsp')
 
-head(f'DONE in {(time.time() - T0) / 60:.1f} min. Tables (csv) and charts (png/pdf) are in: {OUT}')
+# Save enough run metadata to make a result folder interpretable later.
+try:
+    git_revision = subprocess.run(
+        ['git', 'rev-parse', 'HEAD'], cwd=HERE, capture_output=True,
+        text=True, check=False
+    ).stdout.strip() or None
+except OSError:
+    git_revision = None
+
+package_versions = {}
+from importlib import metadata as importlib_metadata
+for package in ('biosteam', 'thermosteam', 'chaospy', 'numpy', 'scipy', 'pandas', 'matplotlib'):
+    try:
+        package_versions[package] = importlib_metadata.version(package)
+    except importlib_metadata.PackageNotFoundError:
+        package_versions[package] = None
+
+manifest = {
+    'started_at_local': time.strftime('%Y-%m-%dT%H:%M:%S', time.localtime(T0)),
+    'completed_at_local': time.strftime('%Y-%m-%dT%H:%M:%S'),
+    'elapsed_minutes': round((time.time() - T0) / 60, 3),
+    'command_line': sys.argv,
+    'quick_mode': bool(args.quick),
+    'monte_carlo_samples_requested': 0 if args.quick else args.n,
+    'monte_carlo_seed': None if args.quick else args.seed,
+    'output_directory': os.path.abspath(OUT),
+    'git_revision': git_revision,
+    'python_version': platform.python_version(),
+    'platform': platform.platform(),
+    'package_versions': package_versions,
+    'baseline': {
+        'ethanol_route': s_['ethanol_route'],
+        'hydrogen_route': s_['h2_route'],
+        'ethanol_capacity_KLPD': s_['ethanol_KLPD'],
+        'MJSP_INR_L': float(base['MJSP_INR_L']),
+        'SAF_MMgal_yr': float(base['SAF_MMgal_yr']),
+    },
+}
+with open(_free_path('run_manifest', '.json'), 'w', encoding='utf-8') as f:
+    json.dump(manifest, f, indent=2)
+
+head(f'DONE in {(time.time() - T0) / 60:.1f} min. Tables (csv), charts (png/pdf), and run_manifest.json are in: {OUT}')
 if not args.no_show:
     try:
         plt.show()
