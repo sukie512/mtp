@@ -217,6 +217,22 @@ if not args.quick:
     col = [c for c in tbl.columns if 'MJSP' in str(c) and 'INR' in str(c)][0]
     tbl = tbl.dropna(subset=[col]); y = tbl[col].astype(float); print(f'{len(y)} of {args.n} samples converged')
     q = y.quantile([.05, .25, .5, .75, .95]); print('MJSP percentiles [Rs/L]:'); print(q.round(1).to_string()); print('Baseline:', round(base['MJSP_INR_L'], 1))
+    # Prefix-based empirical stability diagnostic. These are subsets of the same
+    # LHS design, not independent replicated LHS runs or a formal convergence proof.
+    checkpoints = sorted(set(min(n, len(y)) for n in (250, 500, 1000, 2000, len(y)) if min(n, len(y)) > 0))
+    conv_rows = []
+    for n_check in checkpoints:
+        yy = y.iloc[:n_check]
+        conv_rows.append({'samples': n_check, 'mean_INR_L': yy.mean(), 'std_INR_L': yy.std(ddof=1),
+                          'P5_INR_L': yy.quantile(.05), 'P50_INR_L': yy.quantile(.50),
+                          'P95_INR_L': yy.quantile(.95)})
+    conv = pd.DataFrame(conv_rows)
+    if len(conv) > 1:
+        conv['P50_change_pct'] = conv['P50_INR_L'].pct_change() * 100
+        conv['P95_change_pct'] = conv['P95_INR_L'].pct_change() * 100
+    print('\\nPrefix-based Monte Carlo stability diagnostic (not independent LHS replications):')
+    print(conv.round(2).to_string(index=False))
+    conv.to_csv(_free_path('monte_carlo_convergence', '.csv'), index=False)
     _p = _free_path('monte_carlo_samples', '.csv'); tbl.to_csv(_p); print('   [samples saved:', os.path.basename(_p) + ']', flush=True)
     fig, ax = plt.subplots(1, 2, figsize=(13, 5)); ax[0].hist(y, bins=24, color='#3b8f83', alpha=.88, edgecolor='white'); ax[0].axvline(base['MJSP_INR_L'], color='#333333', ls='--', lw=1.8, label='Deterministic baseline')
     for k, c in zip([.05, .5, .95], ['#457b9d', '#e9c46a', '#e76f51']): ax[0].axvline(q[k], color=c, label=f'P{int(k * 100)}')
