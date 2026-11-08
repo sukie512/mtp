@@ -1,0 +1,90 @@
+# MTP model review and presentation guide
+
+## Model architecture
+
+The repository implements an India-focused alcohol-to-jet (ATJ) techno-economic model for producing sustainable aviation fuel (SAF) from ethanol. The main computational path is:
+
+`settings.py` → `atj_chemicals.py` → `units.py` → `system.py` → `tea.py` → `analysis.py` → `uncertainty.py` → `run_all.py`
+
+The `.xlsm` literature/input workbook is not read or modified by the plotting changes in this branch.
+
+## What each source file does
+
+| File | Responsibility | How to think about it |
+|---|---|---|
+| `settings.py` | Central assumptions: plant capacity, feedstock prices, utilities, finance, catalysts, reactor conditions and exchange rate | The model's input sheet. Each value should have a source or be clearly identified as an assumption. |
+| `atj_chemicals.py` | Defines the chemical species and chemical groups used by BioSTEAM | The model's chemical dictionary: ethanol, water, ethylene, olefins, paraffins and product cuts. |
+| `asf_model.py` | Implements Anderson–Schulz–Flory (ASF) chain-growth fractions, the temperature/pressure relation for alpha, calibration and cycle-average deactivation | The mathematical selectivity and catalyst-activity model. |
+| `units.py` | Defines custom BioSTEAM unit operations: catalytic reactors, dehydration, oligomerization, hydrogenation and storage tanks | The individual process equipment models and their mass/energy/cost calculations. |
+| `system.py` | Connects all units and streams into the complete flowsheet; assigns stream and utility prices | The process flowsheet: feed preparation, dehydration, purification, oligomerization, hydrogenation, separation and storage. |
+| `tea.py` | Defines the India-specific discounted-cash-flow TEA and capital/operating-cost factors | Converts the simulated plant into project cash flows and a minimum selling price. |
+| `analysis.py` | Runs a fresh flowsheet, calculates headline metrics and performs deterministic parameter sweeps | The analysis API used by the runner and uncertainty model. |
+| `uncertainty.py` | Defines uncertain parameters, Latin-hypercube sampling, model evaluation and metrics | Propagates uncertain technical/economic inputs into MJSP and SAF-yield distributions. |
+| `selectivity_scenarios.py` | Compares the fixed literature split with ASF-based product distribution | A focused comparison of two different selectivity representations. |
+| `validate_paper.py` | Reconstructs the reference paper's assumptions and checks how closely the repository model reproduces them | A validation exercise; it is not the India base case. |
+| `run_all.py` | Runs the baseline, cost breakdown, deterministic sweeps and Monte Carlo analysis; exports tables and figures | The end-to-end analysis and plotting entry point. |
+| `units.py` / `system.py` | Contain the process/equipment implementation and flowsheet wiring respectively | Keep physical transformations in units and process connectivity/pricing in the flowsheet. |
+| `india_atj_colab.ipynb` | Notebook-based packaging/execution workflow | Treat as a second execution route; reconcile it with the root-level Python modules before presenting it as the canonical model. |
+
+## Changes made on this branch
+
+### 1. Presentation-ready plots
+
+- Standardized the plotting font to DejaVu Sans and increased axis, tick, legend and title sizes.
+- Set 300 dpi PNG export and added PDF export for vector-quality slides.
+- Replaced informal/placeholder chart titles and labels with descriptive titles and physical units.
+- Renamed chart files with ordered, descriptive names.
+- Added clearer labels for MJSP, SAF production, plant capacity, hydrogen price, reactor temperature/pressure and catalyst deactivation.
+- Removed the plot annotation that explicitly called an ethanol price a placeholder. This does **not** validate the input; unresolved assumptions remain documented in the model.
+- Kept figures open for interactive display unless `--no-show` is selected.
+
+### 2. Runner robustness
+
+- Removed global warning suppression so important BioSTEAM, numerical and thermodynamic warnings remain visible.
+- Corrected the fallback sweep logic so it does not re-run the baseline simulation for every failed sweep point merely to discover the output columns.
+- Replaced runtime source-code rewriting for importing `uncertainty.py` with normal imports; the uncertainty module now supports both package and flat-folder execution.
+
+### 3. ASF distribution tail
+
+`weight_fractions()` previously truncated the ASF distribution at `kmax` and renormalized the retained terms. At high alpha this can bias the distribution because a non-negligible amount of mass can lie beyond the cutoff. The last returned bin now represents the complete `k >= kmax` tail, preserving the infinite-series mass balance without artificial renormalization.
+
+### 4. Scenario isolation
+
+`analysis.run(s=...)` previously modified a caller-supplied settings dictionary in place. It now deep-copies supplied settings so one scenario cannot silently contaminate a later scenario.
+
+## Important scientific/model issues still requiring a decision
+
+These are not cosmetic issues. They can change the reported MJSP, selectivity or engineering interpretation. They have deliberately not been silently changed.
+
+1. **ASF monomer basis (important):** `weight_fractions()` includes the `k=1` C2/ethylene term, while the oligomerizer writes product streams only for `k=2...9`. Confirm whether the literature selectivity denominator is total converted ethylene including monomer, or only oligomer products C4+. The calibration and product split must use the same basis. Do not claim a validated C8–C16 yield until this is resolved.
+2. **63% reference selectivity:** the current calibration target is 63 wt% C8+ (k ≥ 4) according to the code's ASF basis; it is not the same as 63 wt% C8–C16 SAF. The paper's fixed 20/15/62/3 split is a different product-distribution assumption. Keep the comparison explicit.
+3. **Temperature sensitivity parameter:** `dE = 15 kJ/mol` is currently an unresolved assumption. A single reference selectivity point can calibrate the intercept (`beta0`) but cannot identify the temperature slope (`dE`). T–P sweep trends are exploratory until a second or multiple temperature-selectivity data points support a fit.
+4. **Catalyst deactivation:** `kd` and cycle length affect cycle-average activity, while catalyst lifetime affects replacement cost. They are separate inputs and need separate evidence; one must not be used as a proxy for the other.
+5. **Depreciation:** `tea.py` creates a WDV-shaped depreciation vector and normalizes it to 100% over the project life. That is a modelling simplification, not automatically the Indian statutory WDV tax schedule. Confirm the intended tax treatment, terminal book value and disposal treatment with the TEA methodology before using the tax shield in a final result.
+6. **Green hydrogen boundary:** on-site and off-site green hydrogen prices alone do not make the routes equivalent. A defensible on-site case should include electrolyser capital, renewable electricity, water treatment, compression/storage, stack replacement and utilization factor. If those are outside the system boundary, state that explicitly.
+7. **Equipment cost correlations:** the pressure-vessel correlation in `units.py` is explicitly marked as requiring verification against the cited source. Verify vessel sizing, design pressure, wall thickness, material, CEPCI basis and purchase/installed-cost treatment before treating FCI as final.
+8. **Capacity basis:** confirm whether KLPD means ethanol volume or total ethanol-water feed volume. The current mass-flow helper uses ethanol density; the model basis and density conversion must agree.
+9. **Uncertainty distributions:** several bounds are judgement-based or marked unresolved in the source comments. Keep them as scenario ranges, not empirical confidence intervals, until supported by traceable data.
+10. **Independent validation:** run elemental balances (C/H/O), stream mass balances, energy-duty checks and selected unit tests against hand calculations and literature data. A successful BioSTEAM simulation alone does not validate the process model.
+
+## Running the updated analysis
+
+From the repository folder, with the required Python packages installed:
+
+```bash
+python run_all.py --quick --no-show
+```
+
+This runs the deterministic cases and saves the figures/tables without opening plot windows.
+
+For the full uncertainty run:
+
+```bash
+python run_all.py --n 300 --no-show
+```
+
+The figures are written to `results/` as high-resolution PNG and PDF files; tables are exported as CSV. The full Monte Carlo runtime depends on the machine and convergence behaviour.
+
+## Validation status
+
+This branch contains static code changes only. The BioSTEAM flowsheet and full Monte Carlo run have not been executed in this review environment. Therefore no new numerical result, MJSP, selectivity value or plot is represented as runtime-verified. Run the commands above locally and inspect solver warnings, convergence counts and mass/element balances before using the figures in a defence or presentation.
