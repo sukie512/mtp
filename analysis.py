@@ -46,7 +46,7 @@ def process_material_feeds(sys):
     would therefore report a false mass/element loss. The excluded catalyst
     flow is reported separately by process_mass_balance_diagnostics().
     """
-    return tuple(stream for stream in sys.feeds if stream.ID not in CATALYST_MAKEUP_IDS)
+    return tuple(stream for stream in sys.feeds if getattr(stream, 'ID', None) not in CATALYST_MAKEUP_IDS)
 
 
 def process_mass_balance_diagnostics(sys):
