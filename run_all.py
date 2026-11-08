@@ -373,6 +373,7 @@ manifest = {
     'python_version': platform.python_version(),
     'platform': platform.platform(),
     'package_versions': package_versions,
+    'model_inputs': s_,
     'monte_carlo_summary': mc_summary,
     'baseline': {
         'ethanol_route': s_['ethanol_route'],
