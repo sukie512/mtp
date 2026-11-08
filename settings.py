@@ -13,7 +13,7 @@ import copy
 
 S = dict(
     # ------------------------------------------------------------------ macro / finance
-    fx=95.5,                      # INR per USD. [VERIFIED-26] spot ~95.8 (Jul 2026) to ~95.95 (16 Sep 2026): forecasts.org, longforecast.com. Re-check on the day you run.
+    fx=94.1402,                   # INR per USD. [VERIFIED-26] FBIL/RBI reference rate, 6 Nov 2026 (RBI Current Rates page; latest published business-day observation before 9 Nov). Refresh for the actual run date.
     CEPCI=800.8,                  # [REPO] 2023 Chemical Engineering Plant Cost Index used by the paper (chemengonline.com/pci-home)
     location_factor=0.90,         # [UNRESOLVED] India vs US Gulf Coast installed-cost ratio. Only paywalled sources exist: S&P Global PEP Review RW2024-10 (India is among 34 locations, USGC=1.0) and Intratec India IL-factor. Get the India value from one of them (or an EPC quote)
     IRR=0.10,                     # [REPO] after-tax return used by the paper to define MJSP (NPV=0)
@@ -51,14 +51,14 @@ S = dict(
     # ------------------------------------------------------------------ hydrogen
     h2_route='green_offsite',
     # H2 price, INR/kg.
-    #  green_offsite 363 = [DERIVED] Emkay Global (Jul 2026): ~USD 3.8/kg excl. GST from recent refinery/fertiliser bids x 95.5
+    #  green_offsite 358 = [DERIVED] Emkay Global (Jul 2026): ~USD 3.8/kg excl. GST from recent refinery/fertiliser bids x 94.1402 (6 Nov 2026 RBI/FBIL rate)
     #     (bioenergytimes.com, 25 Jul 2026). Anchors: Numaligarh refinery tender Rs 279/kg (solarquarter.com/2026/03/20; hydrogenfuelnews.com),
     #     IOCL Panipat/L&T tender Rs 397/kg incl. 18% GST (energyintel.com; jmkresearch.com). These are PRICES AT A REFINERY GATE: delivery
     #     to a distillery elsewhere is extra and is [UNRESOLVED] (the model separately costs the 7-day storage tanks).
-    #  grey_smr_refinery 200 = [DERIVED] ~USD 2.1/kg average grey H2 (jmkresearch.com, IOCL tender article) x 95.5
+    #  grey_smr_refinery 198 = [DERIVED] ~USD 2.1/kg average grey H2 (jmkresearch.com, IOCL tender article) x 94.1402 (6 Nov 2026 RBI/FBIL rate)
     #  green_onsite 363 and blue_smr_ccs 260 = [UNRESOLVED] no India source found; green_onsite needs an electrolyser capex + solar/wind PPA
     #     calculation (solar bids reach ~Rs 2/kWh per hydrogenfuelnews.com), blue needs a CCS cost; both are copies/placeholders, do not report them.
-    h2_INR_kg={'green_offsite': 363.0, 'green_onsite': 363.0, 'grey_smr_refinery': 200.0, 'blue_smr_ccs': 260.0},
+    h2_INR_kg={'green_offsite': 358.0, 'green_onsite': 358.0, 'grey_smr_refinery': 198.0, 'blue_smr_ccs': 260.0},
     h2_comparison_routes=('green_offsite', 'grey_smr_refinery'),  # exclude onsite/blue until full production and delivery costs are modelled
     h2_storage_days=7,            # [REPO]
     h2_ratio=3.0,                 # mol H2 : mol olefin at hydrogenator inlet [REPO]
@@ -106,7 +106,7 @@ S = dict(
               #   not assume one implies or constrains the other. Needs Ni/SiO2-Al2O3 time-on-stream data.
     hydgn=dict(T=623.15, P=35e5, X=1.0, whsv=3.0),        # [REPO]; Tao et al. 2017 Green Chem 19:1082
     # ------------------------------------------------------------------ policy / benchmark (used only in analysis.py)
-    fossil_atf_INR_L=117.6,       # [VERIFIED-26] ATF Delhi Rs 1,17,587.64/kL after the 1 Aug 2026 cut (PTI via outlookbusiness.com/news/atf-price-slashed...). Volatile: Delhi was Rs 1.05 lakh/kL on 1 Apr 2026 (indiatvnews.com). UPDATE from the 1 Nov 2026 IOCL notification
+    fossil_atf_INR_L=138.50,      # [VERIFIED-26] Delhi ATF for domestic airlines, reported by OMCs at Rs 138.50/L effective 1 Nov 2026 (UNI, 1 Nov 2026; recheck the direct IOCL notification). This is an indicative price-parity benchmark, not automatically comparable with plant-gate SAF MJSP.
 )
 
 def get():
