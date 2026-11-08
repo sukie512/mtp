@@ -94,10 +94,12 @@ def table(df, name, cols=None):
     print(d.round(4).to_string(index=False)); d.to_csv(_free_path(name, '.csv'), index=False)
 
 # ------------------------------------------------------------------ 1 baseline
-head('1. BASELINE: 200 KLPD ethanol (B-heavy molasses), green H2 off-site, Indian finance')
+head(f"1. BASELINE: {s_['ethanol_KLPD']:.0f} KLPD {s_['ethanol_route']} ethanol, {s_['h2_route']} hydrogen, Indian finance")
 sys_, tea_, F_, s_ = A.run(); base = A.results(sys_, tea_, F_, s_)
 print(pd.Series(base).round(3).to_string())
 print(f"\n>>> MJSP = {base['MJSP_USD_gal']:.2f} USD/gal = Rs {base['MJSP_INR_L']:.0f}/L ; SAF = {base['SAF_MMgal_yr']:.2f} MM gal/yr")
+if s_['ethanol_route'] == '2G_cellulosic':
+    print('NOTE: 2G ethanol input is a quoted production-cost proxy, not an administered ex-mill price; the transport adder and delivered basis remain unresolved.')
 
 # ------------------------------------------------------------------ 2 cost breakdown
 head('2. WHERE THE MONEY GOES')
