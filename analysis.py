@@ -1,0 +1,83 @@
+"""
+analysis.py -- everything you RUN. Depends on: settings.py, system.py (and asf_model.py indirectly).
+Each function builds a fresh flowsheet from a (possibly modified) copy of settings, simulates, and returns numbers.
+"""
+import itertools, warnings
+import numpy as np, pandas as pd
+import biosteam as bst
+
+try:
+    from . import settings as cfg
+    from .system import build
+except ImportError:
+    import settings as cfg
+    from system import build
+
+warnings.filterwarnings('ignore')
+_n = itertools.count(1)
+GAL = 264.172        # gal per m3
+
+def run(s=None, **overrides):
+    """Build + simulate. overrides use dotted keys, e.g. run(**{'olig.T': 403.15, 'ethanol_route': 'maize'})."""
+    s = s or cfg.get()
+    for k, v in overrides.items():
+        if '.' in k:
+            a, b = k.split('.'); s[a][b] = v
+        else:
+            s[k] = v
+    sys, tea, F = build(s, ID=f'run{next(_n)}')
+    sys.simulate()
+    return sys, tea, F, s
+
+def results(sys, tea, F, s):
+    """One-row summary. Units: USD/gal and INR/L for MJSP; H2 intensity computed correctly (kg H2 per tonne of fuel)."""
+    st = F.stream; hrs = tea.operating_hours
+    p = tea.solve_price(st.SAF)                                    # USD/kg  (NPV = 0 at IRR)
+    saf_gal = st.SAF.F_vol * GAL * hrs
+    fuel_kg = st.SAF.F_mass + st.RN.F_mass + st.RD.F_mass
+    ol = F.unit.R202
+    return dict(MJSP_USD_gal=p * st.SAF.rho / GAL, MJSP_INR_L=p * st.SAF.rho / 1000 * s['fx'],
+                SAF_MMgal_yr=saf_gal / 1e6, SAF_frac_of_fuel=st.SAF.F_mass / fuel_kg,
+                RN_MMgal_yr=st.RN.F_vol * GAL * hrs / 1e6, RD_MMgal_yr=st.RD.F_vol * GAL * hrs / 1e6,
+                alpha=ol.alpha, olig_X_avg=ol.X_avg,
+                H2_kg_hr=st.Hydrogen_In.F_mass, H2_kg_per_tonne_fuel=st.Hydrogen_In.F_mass / fuel_kg * 1000,
+                installed_MM_USD=tea.installed_equipment_cost / 1e6, FCI_MM_USD=tea.FCI / 1e6,
+                FOC_MM_USD_yr=tea.FOC / 1e6, VOC_MM_USD_yr=tea.VOC / 1e6, sales_MM_USD_yr=tea.sales / 1e6,
+                ethanol_cost_share=st.Ethanol_In.cost * hrs / (tea.VOC + tea.FOC),
+                mass_balance_pct=(sum(x.F_mass for x in sys.feeds) - sum(x.F_mass for x in sys.products))
+                                  / sum(x.F_mass for x in sys.feeds) * 100)
+
+def baseline():
+    return pd.Series(results(*run()))
+
+def sweep_ethanol_route():
+    rows = []
+    for r in cfg.S['ethanol_exmill_INR_L']:
+        rows.append(dict(route=r, **results(*run(ethanol_route=r))))
+    return pd.DataFrame(rows)
+
+def sweep_h2_route():
+    rows = []
+    for r in cfg.S['h2_INR_kg']:
+        rows.append(dict(route=r, **results(*run(h2_route=r))))
+    return pd.DataFrame(rows)
+
+def sweep_scale(KLPD=(50, 100, 150, 200, 300, 400)):
+    rows = []
+    for k in KLPD:
+        rows.append(dict(KLPD=k, **results(*run(ethanol_KLPD=k))))
+    return pd.DataFrame(rows)
+
+def sweep_T_P(Ts=(373.15, 383.15, 393.15, 403.15, 413.15), Ps=(25e5, 35e5, 45e5)):
+    """NEW result (impossible in the paper): selectivity and MJSP as OUTPUTS of reactor T and P."""
+    rows = []
+    for T, P in itertools.product(Ts, Ps):
+        r = results(*run(**{'olig.T': T, 'olig.P': P}))
+        rows.append(dict(T_K=T, P_bar=P / 1e5, **r))
+    return pd.DataFrame(rows)
+
+def sweep_deactivation(kds=(0.0005, 0.001, 0.002, 0.005, 0.01), cycles=(30, 60, 120)):
+    rows = []
+    for kd, c in itertools.product(kds, cycles):
+        rows.append(dict(kd=kd, cycle_days=c, **results(*run(**{'olig.kd': kd, 'olig.cycle_days': c}))))
+    return pd.DataFrame(rows)
