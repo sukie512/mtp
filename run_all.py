@@ -170,7 +170,8 @@ ax.set_xlabel('Ethanol feedstock route'); plt.xticks(rotation=20, ha='right'); f
 
 # ------------------------------------------------------------------ 5 hydrogen
 head('5. HYDROGEN SUPPLY ROUTE COMPARISON')
-hr = safe(A.sweep_h2_route, [({'route': r}, {'h2_route': r}) for r in cfg.S['h2_INR_kg']], 'sweep_h2_route'); table(hr, 'h2_routes', ['route', 'MJSP_USD_gal', 'MJSP_INR_L', 'H2_kg_per_tonne_fuel'])
+print('On-site green H2 and blue H2 are excluded: electrolyser/renewable-system and CCS costs are not yet modelled.')
+hr = safe(A.sweep_h2_route, [({'route': r}, {'h2_route': r}) for r in cfg.S.get('h2_comparison_routes', tuple(cfg.S['h2_INR_kg']))], 'sweep_h2_route'); table(hr, 'h2_routes', ['route', 'MJSP_USD_gal', 'MJSP_INR_L', 'H2_kg_per_tonne_fuel'])
 fig, ax = plt.subplots(1, 2, figsize=(13, 5)); b = ax[0].bar(hr.route, hr.MJSP_INR_L, color='#4c8298'); ax[0].bar_label(b, fmt='%.0f', padding=4)
 ax[0].set_ylabel('Minimum jet selling price (INR/L)'); ax[0].set_title('Economic Impact of Hydrogen Supply Route')
 ax[1].bar(hr.route, [cfg.S['h2_INR_kg'][r] for r in hr.route], color='#d97757')
