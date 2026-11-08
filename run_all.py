@@ -97,6 +97,9 @@ def table(df, name, cols=None):
 head(f"1. BASELINE: {s_['ethanol_KLPD']:.0f} KLPD {s_['ethanol_route']} ethanol, {s_['h2_route']} hydrogen, Indian finance")
 sys_, tea_, F_, s_ = A.run(); base = A.results(sys_, tea_, F_, s_)
 print(pd.Series(base).round(3).to_string())
+energy_diag = A.unit_energy_diagnostics(sys_)
+energy_diag.to_csv(_free_path('unit_energy_diagnostics', '.csv'), index=False)
+print('Unit-level heat-duty and power diagnostics saved to unit_energy_diagnostics.csv')
 print(f"\n>>> MJSP = {base['MJSP_USD_gal']:.2f} USD/gal = Rs {base['MJSP_INR_L']:.0f}/L ; SAF = {base['SAF_MMgal_yr']:.2f} MM gal/yr")
 if s_['ethanol_route'] == '2G_cellulosic':
     print('NOTE: 2G ethanol input is a quoted production-cost proxy, not an administered ex-mill price; the transport adder and delivered basis remain unresolved.')
