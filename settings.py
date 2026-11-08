@@ -88,10 +88,10 @@ S = dict(
               #   population, can reach 63% C8-C16 -- the max for any such model is 45.57% (asf_model.max_c8_c16_share).
               #   This is a genuine structural gap between the paper's assumed catalyst behaviour and a chain-growth
               #   mechanism, not a fitting problem; report it as such rather than forcing a fit to 34/63/3.
-              c8plus_ref=0.63,                              # Heveling: 63 wt% C8+ (unbounded, k>=4) at 393 K / 35 bar -- VERIFIED: calibrate_beta0(0.63) correctly gives alpha=0.6877
+              c8plus_ref=0.63,                              # Heveling: 63 wt% C8+ (k>=4) on oligomer-product basis at 393 K / 35 bar; calibrate_beta0(0.63) gives alpha≈0.6423
               dE=15e3,                                      # [UNRESOLVED] J/mol. MODEL STRUCTURE (review, Oct 2026): alpha(T,P) has TWO parameters, not one --
               #   beta0 is the INTERCEPT: calibrated in units.py so alpha AT (T_ref=393.15K, P_ref=35bar) reproduces
-              #   the single Heveling 1998 data point (63 wt% C8+). This is the one observation available and it
+              #   the single Heveling 1998 data point (63 wt% C8+ of k>=2 oligomer products). This is the one observation available and it
               #   correctly identifies only beta0, as the review notes -- it does NOT and cannot also fix dE.
               #   dE is the SLOPE (how fast alpha changes with T): sign convention is beta = beta0*exp(-dE/R*(1/T-1/T_ref))*(P_ref/P),
               #   i.e. dE = E_term - E_prop > 0 means hotter -> more termination -> shorter chains (verified in asf_model.py).
