@@ -30,7 +30,8 @@ Conventional routes (B-heavy molasses, C-heavy molasses, cane juice, maize, rice
 | tea.py | India-specific discounted-cash-flow TEA |
 | analysis.py | Baseline simulation, headline metrics and deterministic sweeps |
 | uncertainty.py | Latin-hypercube sampling, coupled process inputs, economic inputs and MJSP metrics |
-| run_all.py | End-to-end runner, terminal tables, CSV exports, PNG/PDF figures and run manifest |\n| run_mc_replicates.py | Independent Latin-hypercube replicates for Monte Carlo stability checks |
+| run_all.py | End-to-end runner, terminal tables, CSV exports, PNG/PDF figures and run manifest |
+| run_mc_replicates.py | Independent Latin-hypercube replicates for Monte Carlo stability checks |
 | selectivity_scenarios.py | ASF versus fixed-literature selectivity comparison |
 | validate_paper.py | Reference-paper comparison workflow |
 | MODEL_REVIEW_AND_PLOT_GUIDE.md | Detailed model architecture, changes, scientific caveats and validation checklist |
@@ -174,7 +175,8 @@ These tests cover ASF distribution normalization, the oligomer-product basis, th
 6. **Depreciation:** the TEA uses a simplified WDV-shaped proxy. It does not split tax asset blocks or model terminal disposal proceeds / tax recapture.
 7. **Equipment costs:** the pressure-vessel cost correlation is explicitly marked in units.py as requiring verification against its source. Some equipment correlations may be outside their stated ranges.
 8. **Capacity basis:** KLPD is treated as total ethanol-water feed volume. The mass conversion now estimates mixture density using additive specific volumes; validate this against a rigorous ethanol-water mixture property calculation before reporting capacity.
-9. **Balance boundary:** catalyst make-up streams are costed as external feeds, but spent catalyst discharge is not represented. Process-only mass and C/H/O diagnostics exclude `Cat_dehyd`, `Cat_olig` and `Cat_hydgn`, and report their combined flow separately as `catalyst_makeup_kg_hr_excluded`. This avoids misreporting catalyst replacement as a process loss, but it is not a complete plant-wide waste balance. Add spent-catalyst outlets and disposal/regeneration handling before claiming overall plant closure.\n10. **Independent validation:** complete carbon, hydrogen and oxygen balances, stream mass balances, energy-duty checks, unit checks and selected comparisons against literature or independently calculated values.
+9. **Balance boundary:** catalyst make-up streams are costed as external feeds, but spent catalyst discharge is not represented. Process-only mass and C/H/O diagnostics exclude `Cat_dehyd`, `Cat_olig` and `Cat_hydgn`, and report their combined flow separately as `catalyst_makeup_kg_hr_excluded`. This avoids misreporting catalyst replacement as a process loss, but it is not a complete plant-wide waste balance. Add spent-catalyst outlets and disposal/regeneration handling before claiming overall plant closure.
+10. **Independent validation:** complete carbon, hydrogen and oxygen balances, stream mass balances, energy-duty checks, unit checks and selected comparisons against literature or independently calculated values.
 10. **Runtime status:** a successful BioSTEAM simulation is not, by itself, process validation. Do not report new numerical results as verified until the current branch has been run locally and its logs, warnings, convergence and balances have been reviewed.
 
 For the complete issue-by-issue checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md).
