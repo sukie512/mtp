@@ -59,27 +59,27 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
 
     # ---------- process (coupled) ----------
     add('Oligomerization T', lambda v: set_oligomerization_temperature(U, v), U.R202,
-        shape.Triangle(373.15, 393.15, 413.15), 'coupled', 'K')
+        shape.Triangle(373.15, 393.15, 413.15), 'coupled', 'K')  # scenario range around baseline; verify against Heveling operating data
     add('Oligomerization P', lambda v: set_oligomerization_pressure(U, v), U.R202,
-        shape.Triangle(30e5, 35e5, 40e5), 'coupled', 'Pa')
+        shape.Triangle(30e5, 35e5, 40e5), 'coupled', 'Pa')  # scenario range; not a measured probability distribution
     add('ASF dE (Eterm-Eprop)', lambda v: setattr(U.R202, 'dE', v), U.R202,
-        shape.Uniform(5e3, 30e3), 'coupled', 'J/mol')
+        shape.Uniform(5e3, 30e3), 'coupled', 'J/mol')  # UNRESOLVED: dE is not fitted to multi-temperature selectivity data
     add('Olig. conversion X0', lambda v: setattr(U.R202, 'X0', v), U.R202,
-        shape.Triangle(0.90, 0.993, 0.999), 'coupled')
+        shape.Triangle(0.90, 0.993, 0.999), 'coupled')  # judgement range pending catalyst-performance evidence
     add('Olig. deactivation kd', lambda v: setattr(U.R202, 'kd', v), U.R202,
-        shape.Uniform(5e-4, 1e-2), 'coupled', '1/day')
+        shape.Uniform(5e-4, 1e-2), 'coupled', '1/day')  # UNRESOLVED: obtain time-on-stream deactivation data
     add('Olig. cycle length', lambda v: setattr(U.R202, 'cycle_days', v), U.R202,
-        shape.Uniform(30, 120), 'coupled', 'day')
+        shape.Uniform(30, 120), 'coupled', 'day')  # scenario range; replacement interval is not experimentally established
     add('Olig. WHSV', lambda v: setattr(U.R202, 'whsv', v), U.R202,
-        shape.Uniform(1.0, 2.0), 'coupled')
+        shape.Uniform(1.0, 2.0), 'coupled')  # engineering scenario range around 1.5 h-1 reference
     add('Dehydration conversion', lambda v: setattr(U.R201, 'X', v), U.R201,
-        shape.Triangle(0.97, 0.995, 0.999), 'coupled')
+        shape.Triangle(0.97, 0.995, 0.999), 'coupled')  # judgement range around literature/base conversion
     add('Dehydration WHSV', lambda v: setattr(U.R201, 'whsv', v), U.R201,
-        shape.Uniform(0.24, 0.36), 'coupled')
+        shape.Uniform(0.24, 0.36), 'coupled')  # +/-20% scenario range around 0.30 h-1
     add('Olig. catalyst life', lambda v: setattr(U.R202, 'cat_life_yr', v), U.R202,
-        shape.Uniform(0.5, 2.0), 'coupled', 'yr')
+        shape.Uniform(0.5, 2.0), 'coupled', 'yr')  # scenario range; source-specific catalyst life required
     add('Hydrogenation catalyst life', lambda v: setattr(U.R203, 'cat_life_yr', v), U.R203,
-        shape.Uniform(2.0, 5.0), 'coupled', 'yr')
+        shape.Uniform(2.0, 5.0), 'coupled', 'yr')  # literature-derived range; verify catalyst-specific basis
 
     # ---------- economics (isolated) ----------
     sset = lambda key, sub=None, tea_attribute=None: make_setting_setter(s, F, tea, key, sub, tea_attribute)
@@ -87,33 +87,33 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
     route = s['ethanol_route']
     base = s['ethanol_exmill_INR_L'][route]
     add('Ethanol ex-mill price', sset('ethanol_exmill_INR_L', route),
-        st.Ethanol_In, shape.Triangle(0.9 * base, base, 1.15 * base), 'isolated', 'INR/L')
+        st.Ethanol_In, shape.Triangle(0.9 * base, base, 1.15 * base), 'isolated', 'INR/L')  # scenario uncertainty around route-specific input
 
     h2 = s['h2_INR_kg'][s['h2_route']]
     add('Hydrogen delivered price', sset('h2_INR_kg', s['h2_route']),
-        st.Hydrogen_In, shape.Triangle(0.77 * h2, h2, 1.27 * h2), 'isolated', 'INR/kg')
+        st.Hydrogen_In, shape.Triangle(0.77 * h2, h2, 1.27 * h2), 'isolated', 'INR/kg')  # includes a judgement delivery allowance; not a plant-gate quote
 
     add('Naphtha (RN) price', sset('rn_USD_kg'), st.RN,
-        shape.Uniform(0.60, 1.17), 'isolated', 'USD/kg')
+        shape.Uniform(0.60, 1.17), 'isolated', 'USD/kg')  # India 2026 price range; source references in settings.py
     add('Diesel (RD) price', sset('rd_USD_kg'), st.RD,
-        shape.Uniform(0.60, 1.10), 'isolated', 'USD/kg')
+        shape.Uniform(0.60, 1.10), 'isolated', 'USD/kg')  # scenario range around an older India pre-tax price anchor
     add('Electricity tariff', sset('elec_INR_kWh'), st.Ethanol_In,
-        shape.Uniform(5.5, 8.5), 'isolated', 'INR/kWh')
+        shape.Uniform(5.5, 8.5), 'isolated', 'INR/kWh')  # widened state-tariff scenario range; replace with target-state SERC data
     add('INR/USD', sset('fx'), st.Ethanol_In,
-        shape.Triangle(90, 95.5, 102), 'isolated')
+        shape.Triangle(90, 95.5, 102), 'isolated')  # exchange-rate scenario range; refresh at analysis date
     add('Location factor', sset('location_factor'), st.Ethanol_In,
-        shape.Uniform(0.8, 1.1), 'isolated')
+        shape.Uniform(0.8, 1.1), 'isolated')  # UNRESOLVED: India location factor needs EPC / cost-index evidence
     add('Loan interest', sset('finance_interest', tea_attribute='finance_interest'),
-        st.Ethanol_In, shape.Triangle(0.09, 0.10, 0.115), 'isolated')
+        st.Ethanol_In, shape.Triangle(0.09, 0.10, 0.115), 'isolated')  # assumed lending spread; replace with lender term sheet
     add('Natural gas price', sset('ng_INR_kg'), st.Ethanol_In,
-        shape.Triangle(35, 50, 79), 'isolated', 'INR/kg')
+        shape.Triangle(35, 50, 79), 'isolated', 'INR/kg')  # India gas-price anchors; verify GCV basis and delivered cost
     add('Labor cost', sset('labor_USD_yr', tea_attribute='labor_cost'),
-        st.Ethanol_In, shape.Uniform(0.8e6, 2.5e6), 'isolated', 'USD/yr')
+        st.Ethanol_In, shape.Uniform(0.8e6, 2.5e6), 'isolated', 'USD/yr')  # UNRESOLVED: staff count and salary build-up required
 
     for k in ('dehyd', 'olig', 'hydgn'):
         base_c = s['cat_price_USD_kg'][k]
         add(f'{k} catalyst price', sset('cat_price_USD_kg', k),
-            st['Cat_' + k], shape.Uniform(0.5 * base_c, 1.5 * base_c), 'isolated', 'USD/kg')
+            st['Cat_' + k], shape.Uniform(0.5 * base_c, 1.5 * base_c), 'isolated', 'USD/kg')  # +/-50% scenario range; verify catalyst-specific quotes
 
     @model.metric(name='MJSP', units='USD/gal')
     def mjsp():
