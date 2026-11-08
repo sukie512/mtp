@@ -64,13 +64,12 @@ def conversion(X0, kd, tau_days):
     return X0 * cycle_average_activity(kd, tau_days)
 
 def max_c8_c16_share(kmax=200):
-    """PROVEN BOUND (added Oct 2026, in response to an external review claiming a two-population ASF mixture
-    can reach 63% C8-C16): C8-C16 share is a LINEAR functional of the chain-growth distribution (a fixed sum of
-    weight fractions), and is individually bounded for every single alpha in [0,1]. Because any finite mixture
-    of ASF populations is a CONVEX COMBINATION of individual distributions, its C8-C16 share is a weighted
-    average of values that are each <= this bound -- so NO finite mixture of chain-growth populations (one,
-    two, or more) can exceed it either. Verified by direct unconstrained least-squares search (see chat log):
-    the best any two-population fit achieves is ~43.8%, well under even this single-population bound."""
+    """Numerically estimate the maximum C8-C16 share on the oligomer-product basis.
+
+    The share is a linear functional of the product distribution. Any finite
+    mixture of ASF populations is a convex combination, so it cannot exceed
+    the maximum attainable by a single population. The returned value is a
+    grid estimate, not a formal analytic proof of the exact maximum.
     alphas = np.linspace(0.001, 0.999, 2000)
     vals = [oligomer_weight_fractions(a, kmax)[3:8].sum() for a in alphas]
     i = int(np.argmax(vals))
