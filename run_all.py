@@ -2,8 +2,8 @@
 run_all.py  --  RUN THIS FILE.  It calls the model files, prints every result table in the terminal,
 saves every chart as a PNG in ./results/ and (unless --no-show) opens all charts at the end.
 
-    python run_all.py              # 100 Monte Carlo samples (~5-8 min), charts pop up at the end
-    python run_all.py --n 300      # more Monte Carlo samples
+    python run_all.py              # 3000 Latin-hypercube samples (full analysis)
+    python run_all.py --n 3000    # explicitly set the Monte Carlo sample count
     python run_all.py --no-show    # only save PNGs (no windows)
     python run_all.py --quick      # skip Monte Carlo (about 3 min)
 
@@ -16,7 +16,7 @@ Sources for every input are in the comments of settings.py (tags: VERIFIED-26 / 
 import argparse, os, sys, time, warnings
 # Keep scientific warnings visible; suppress only known noisy categories locally if needed.
 ap = argparse.ArgumentParser()
-ap.add_argument('--n', type=int, default=100); ap.add_argument('--no-show', action='store_true'); ap.add_argument('--quick', action='store_true')
+ap.add_argument('--n', type=int, default=3000); ap.add_argument('--no-show', action='store_true'); ap.add_argument('--quick', action='store_true')
 ap.add_argument('--out', default='new_results', help='Output folder for tables and plots (default: new_results)')
 args = ap.parse_args()
 
@@ -211,7 +211,7 @@ fig.tight_layout(); save(fig, '07_catalyst_deactivation_sensitivity')
 
 # ------------------------------------------------------------------ 9 Monte Carlo
 if not args.quick:
-    head(f'9. MONTE CARLO: {args.n} Latin-hypercube samples (about 2-4 s each; please wait)')
+    head(f'9. MONTE CARLO: {args.n} Latin-hypercube samples')
     m = U.run_mc(N=args.n); tbl = m.table
     col = [c for c in tbl.columns if 'MJSP' in str(c) and 'INR' in str(c)][0]
     tbl = tbl.dropna(subset=[col]); y = tbl[col].astype(float); print(f'{len(y)} of {args.n} samples converged')
