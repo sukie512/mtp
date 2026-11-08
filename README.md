@@ -36,6 +36,17 @@ Conventional routes (B-heavy molasses, C-heavy molasses, cane juice, maize, rice
 | MODEL_REVIEW_AND_PLOT_GUIDE.md | Detailed model architecture, changes, scientific caveats and validation checklist |
 | tests/ | Unit tests for pure ASF and WDV-depreciation calculations |
 
+## Get the thesis branch
+
+If you already cloned the repository, update the working copy with:
+
+```bash
+git checkout mtp-presentation-cleanup
+git pull origin mtp-presentation-cleanup
+```
+
+Run the commands below from the repository root. The original literature/input `.xlsm` workbook is not modified by these code and documentation changes.
+
 ## Installation
 
 Use a clean virtual environment. The repository does not currently include a fully pinned lockfile, so record the actual package versions used for any final thesis run.
@@ -126,7 +137,7 @@ Run the pure calculation tests from the repository root:
 pytest -q
 ```
 
-These tests cover ASF distribution normalization, the oligomer-product basis, the C8+ calibration target, the C8–C16 bound check, and the declining-balance depreciation schedule. They do not replace a full BioSTEAM integration test or validation against experimental plant data.
+These tests cover ASF distribution normalization, the oligomer-product basis, the C8+ calibration target, the C8–C16 bound check, WDV depreciation and residual value, Monte Carlo setter propagation, coupled reactor/heater/compressor settings, total feed-volume conversion, and elemental-balance diagnostics. They do not replace a full BioSTEAM integration test or validation against experimental plant data.
 
 ## Important limitations before using results in a thesis
 
