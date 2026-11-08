@@ -18,6 +18,25 @@ except ImportError:  # support running the repository as a flat script folder
     import settings as cfg
 
 
+def make_setting_setter(s, F, tea, key, sub=None, tea_attribute=None):
+    """Create a Monte Carlo setter that updates settings and the live model.
+
+    Price and utility values are propagated through apply_prices(); TEA-owned
+    economic inputs (for example labour and debt interest) are also written to
+    the corresponding live TEA attribute.
+    """
+    def setter(v):
+        value = float(v)
+        if sub is None:
+            s[key] = value
+        else:
+            s[key][sub] = value
+        apply_prices(F, s)
+        if tea_attribute is not None:
+            setattr(tea, tea_attribute, value)
+    return setter
+
+
 def build_model(sys, tea, F, s, MJSP_stream='SAF'):
     model = bst.Model(sys)
     st, U = F.stream, F.unit
@@ -51,17 +70,7 @@ def build_model(sys, tea, F, s, MJSP_stream='SAF'):
         shape.Uniform(2.0, 5.0), 'coupled', 'yr')
 
     # ---------- economics (isolated) ----------
-    def sset(key, sub=None, tea_attribute=None):
-        """Update the source settings and the live model object used by BioSTEAM's TEA."""
-        def f(v):
-            if sub is None:
-                s[key] = float(v)
-            else:
-                s[key][sub] = float(v)
-            apply_prices(F, s)
-            if tea_attribute is not None:
-                setattr(tea, tea_attribute, float(v))
-        return f
+    sset = lambda key, sub=None, tea_attribute=None: make_setting_setter(s, F, tea, key, sub, tea_attribute)
 
     route = s['ethanol_route']
     base = s['ethanol_exmill_INR_L'][route]
