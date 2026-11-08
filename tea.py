@@ -3,9 +3,9 @@ tea.py -- discounted-cash-flow economics with Indian finance. Depends on: settin
 Used by: system.py (builds it), analysis.py (solves MJSP).
 
 Same method as the paper (BioSTEAM TEA, NPV=0 at IRR 10% -> minimum selling price) with India changes:
-  * income tax 25.17%, loan 9.5%  (settings.py)
-  * depreciation = Indian written-down-value (WDV) schedule instead of US MACRS-7
-  * location_factor on installed cost
+  * income tax, debt terms and depreciation assumptions are supplied by settings.py
+  * depreciation uses a simplified 15%-WDV-shaped annual fraction; it is not a complete statutory tax model
+  * location_factor scales calculated fixed capital investment (FCI)
 Capital-cost build-up fractions are the Humbird et al. 2011 (NREL/TP-5100-47764) values the paper's TEA also uses.
 """
 import numpy as np
@@ -15,8 +15,11 @@ class IndiaTEA(bst.TEA):
     def __init__(self, system, s, **kw):
         n = s['duration'][1] - s['duration'][0]
         r = s['wdv_rate']
-        dep = np.array([r * (1 - r) ** t for t in range(n)])          # WDV: d_t = r(1-r)^(t-1); remainder stays undepreciated (simplification)
-        dep = dep / dep.sum()                                          # normalise so 100% is written off over life (see notes)
+        dep = np.array([r * (1 - r) ** t for t in range(n)])
+        # Do not normalize: WDV leaves a residual book fraction after the project horizon.
+        # This is still a simplified tax proxy: the model does not split depreciable asset blocks
+        # or model terminal disposal proceeds / tax recapture.
+        self_depreciation_residual = (1 - r) ** n
         super().__init__(system, IRR=s['IRR'], duration=s['duration'], depreciation=dep,
                          income_tax=s['income_tax'], operating_days=s['operating_days'], lang_factor=None,
                          construction_schedule=s['construction_schedule'], startup_months=3,
@@ -24,6 +27,7 @@ class IndiaTEA(bst.TEA):
                          WC_over_FCI=s['WC_over_FCI'], finance_interest=s['finance_interest'],
                          finance_years=s['finance_years'], finance_fraction=s['finance_fraction'])
         self.s = s
+        self.depreciation_remaining_fraction = self_depreciation_residual
         self.labor_cost = s['labor_USD_yr']; self.labor_burden = 0.90
         self.property_insurance, self.maintenance = 0.007, 0.03        # Humbird 2011 / paper's cellulosic TEA
 
