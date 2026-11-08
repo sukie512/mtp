@@ -14,7 +14,7 @@ The default settings are configured for:
 - **Finance:** India-specific settings in settings.py
 - **Oligomerization:** temperature- and pressure-dependent ASF chain-growth model
 
-The 2G ethanol input of INR 160/L is a quoted production-cost proxy, not an administered ex-mill price. The current transport adder and delivered-price basis are unresolved. The green off-site hydrogen price is a refinery-gate anchor; delivery to the plant is not fully costed. The route-comparison sweep therefore includes only green off-site and grey refinery hydrogen. Green on-site and blue hydrogen are excluded until electrolyser/renewable-system and CCS costs are represented. These caveats are printed by the runner and must accompany any reported baseline MJSP.
+The 2G ethanol input of INR 160/L is a quoted production-cost proxy, not an administered ex-mill price. The conventional-route transport proxy is not applied to 2G; the 2G delivery/logistics cost remains excluded and unresolved. The green off-site hydrogen price is a refinery-gate anchor; delivery to the plant is not fully costed. The route-comparison sweep therefore includes only green off-site and grey refinery hydrogen. Green on-site and blue hydrogen are excluded until electrolyser/renewable-system and CCS costs are represented. These caveats are printed by the runner and must accompany any reported baseline MJSP.
 
 Conventional routes (B-heavy molasses, C-heavy molasses, cane juice, maize, rice and damaged grain) remain in the ethanol-route comparison sweep. They are not the thesis's 2G baseline.
 
