@@ -237,12 +237,36 @@ ax.grid(False); cb = plt.colorbar(im, ax=ax); cb.set_label('Minimum jet selling 
 fig.tight_layout(); save(fig, '07_catalyst_deactivation_sensitivity')
 
 # ------------------------------------------------------------------ 9 Monte Carlo
+mc_summary = None
 if not args.quick:
     head(f'9. MONTE CARLO: {args.n} Latin-hypercube samples')
-    m = U.run_mc(N=args.n, seed=args.seed); tbl = m.table
-    col = [c for c in tbl.columns if 'MJSP' in str(c) and 'INR' in str(c)][0]
-    tbl = tbl.dropna(subset=[col]); y = tbl[col].astype(float); print(f'{len(y)} of {args.n} samples converged')
+    m = U.run_mc(N=args.n, seed=args.seed)
+    raw_tbl = m.table.copy()
+    col = [c for c in raw_tbl.columns if 'MJSP' in str(c) and 'INR' in str(c)][0]
+    metric_values = pd.to_numeric(raw_tbl[col], errors='coerce')
+    valid_mask = metric_values.notna() & np.isfinite(metric_values)
+    failed_tbl = raw_tbl.loc[~valid_mask].copy()
+    tbl = raw_tbl.loc[valid_mask].copy()
+    y = metric_values.loc[valid_mask].astype(float)
+    if len(y) < 2:
+        raise RuntimeError(
+            f'Only {len(y)} of {args.n} Monte Carlo samples converged; '
+            'at least two valid samples are required for distribution and rank diagnostics.'
+        )
+    failed_tbl.to_csv(_free_path('monte_carlo_failed_samples', '.csv'), index=True)
+    print(f'{len(y)} of {args.n} samples converged; {len(failed_tbl)} failed or non-finite samples saved separately')
     q = y.quantile([.05, .25, .5, .75, .95]); print('MJSP percentiles [Rs/L]:'); print(q.round(1).to_string()); print('Baseline:', round(base['MJSP_INR_L'], 1))
+    mc_summary = {
+        'requested_samples': int(args.n),
+        'valid_samples': int(len(y)),
+        'failed_or_nonfinite_samples': int(len(failed_tbl)),
+        'failure_fraction': float(len(failed_tbl) / args.n),
+        'MJSP_INR_L_percentiles': {
+            'P5': float(q.loc[0.05]), 'P25': float(q.loc[0.25]),
+            'P50': float(q.loc[0.50]), 'P75': float(q.loc[0.75]),
+            'P95': float(q.loc[0.95]),
+        },
+    }
     # Prefix-based empirical stability diagnostic. These are subsets of the same
     # LHS design, not independent replicated LHS runs or a formal convergence proof.
     checkpoints = sorted(set(min(n, len(y)) for n in (250, 500, 1000, 2000, len(y)) if min(n, len(y)) > 0))
@@ -321,6 +345,7 @@ manifest = {
     'python_version': platform.python_version(),
     'platform': platform.platform(),
     'package_versions': package_versions,
+    'monte_carlo_summary': mc_summary,
     'baseline': {
         'ethanol_route': s_['ethanol_route'],
         'hydrogen_route': s_['h2_route'],
