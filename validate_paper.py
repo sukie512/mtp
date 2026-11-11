@@ -50,8 +50,11 @@ def groups(F):
     return {k: sum(getattr(F.unit, u).installed_cost for u in v if hasattr(F.unit, u)) for k, v in g.items()}
 
 def run_case(label, fixed_split):
-    orig = units.weight_fractions
-    units.weight_fractions = paper_split if fixed_split else orig
+    # ASFOligomerizer imports and calls oligomer_weight_fractions directly.
+    # Patch that exact symbol; patching units.weight_fractions creates an unused
+    # attribute and the reference-split case otherwise fails to affect the reactor.
+    orig = units.oligomer_weight_fractions
+    units.oligomer_weight_fractions = paper_split if fixed_split else orig
     try:
         s = us_settings()
         sys_, tea, F = SYS.build(s, ID='val_' + label[0])      # build, then relax the column check (trace ethanol with the fixed split)
@@ -73,7 +76,7 @@ def run_case(label, fixed_split):
                    RN_rev_per_gal=st.RN.cost * hrs / (st.SAF.F_vol * 264.172 * hrs), RD_rev_per_gal=st.RD.cost * hrs / (st.SAF.F_vol * 264.172 * hrs))
         return row
     finally:
-        units.weight_fractions = orig
+        units.oligomer_weight_fractions = orig
 
 rows = [run_case('A: US inputs + ASF selectivity', False), run_case('B: US inputs + paper split', True)]
 df = pd.DataFrame(rows).set_index('case').T
