@@ -21,7 +21,7 @@ ap.add_argument('--seed', type=int, default=1234, help='Random seed for reproduc
 ap.add_argument('--no-show', action='store_true')
 ap.add_argument('--quick', action='store_true')
 ap.add_argument('--out', default='final_results', help='Output folder for tables and plots (default: final_results)')
- ap.add_argument('--skip-validation', action='store_true', help='Skip the reference-paper comparison stage')
+ap.add_argument('--skip-validation', action='store_true', help='Skip the reference-paper comparison stage')
 args = ap.parse_args()
 if not args.quick and args.n < 2:
     ap.error('--n must be at least 2 for a Monte Carlo run')
