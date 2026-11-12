@@ -59,26 +59,39 @@ def groups(F):
 def run_case(label, fixed_split):
     s = us_settings()
     if fixed_split:
-        # Use the model's native fixed-literature mode rather than monkey-patching
-        # an ASF helper that is no longer part of the unit-operation API.
+        # Use the model's native fixed-literature mode; do not monkey-patch
+        # the ASF distribution helper.
         s['olig']['mode'] = 'fixed_literature'
-    sys_, tea, F = SYS.build(s, ID='val_' + label[0])      # build, then relax the column check (trace ethanol with the fixed split)
-        for u in ('D201', 'D202', 'D301', 'D302'):
-            getattr(F.unit, u).check_LHK = False
-        if fixed_split:                                          # paper's slate has no C8/C12-C16: cut between the lumps it actually has
-            F.unit.D301.LHK = ('Hexane', 'Decane'); F.unit.D302.LHK = ('Decane', 'Octadecane')
-        sys_.simulate()
-        tea.depreciation = 'MACRS7'                                     # paper: MACRS 7-yr, not Indian WDV
-        r = A.results(sys_, tea, F, s)
-        hrs = tea.operating_hours; st = F.stream
-        toc = (tea.VOC + tea.FOC) / 1e6; tic = tea.installed_equipment_cost / 1e6; gp = groups(F); gsum = sum(gp.values())
-        row = dict(case=label, MJSP=r['MJSP_USD_gal'], SAF_MMgal=r['SAF_MMgal_yr'], TIC=tic, TOC=toc,
-                   eth_share=st.Ethanol_In.cost * hrs / 1e6 / toc * 100, h2_share=st.Hydrogen_In.cost * hrs / 1e6 / toc * 100,
-                   fixed_share=tea.FOC / 1e6 / toc * 100, util_share=sys_.utility_cost / 1e6 / toc * 100,
-                   storage=gp['storage'] / (tic * 1e6) * 100, upgrading=gp['upgrading'] / (tic * 1e6) * 100,
-                   fract=gp['fract'] / (tic * 1e6) * 100, bt=0.0, wwt=0.0,
-                   eth_per_gal=st.Ethanol_In.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
-                   RN_rev_per_gal=st.RN.cost * hrs / (st.SAF.F_vol * 264.172 * hrs), RD_rev_per_gal=st.RD.cost * hrs / (st.SAF.F_vol * 264.172 * hrs))
+    sys_, tea, F = SYS.build(s, ID='val_' + label[0])
+    for u in ('D201', 'D202', 'D301', 'D302'):
+        getattr(F.unit, u).check_LHK = False
+    if fixed_split:
+        # The paper's slate has C4/C6/C10/C18 lumps; place column cuts between them.
+        F.unit.D301.LHK = ('Hexane', 'Decane')
+        F.unit.D302.LHK = ('Decane', 'Octadecane')
+    sys_.simulate()
+    tea.depreciation = 'MACRS7'
+    r = A.results(sys_, tea, F, s)
+    hrs = tea.operating_hours
+    st = F.stream
+    toc = (tea.VOC + tea.FOC) / 1e6
+    tic = tea.installed_equipment_cost / 1e6
+    gp = groups(F)
+    row = dict(
+        case=label, MJSP=r['MJSP_USD_gal'], SAF_MMgal=r['SAF_MMgal_yr'],
+        TIC=tic, TOC=toc,
+        eth_share=st.Ethanol_In.cost * hrs / 1e6 / toc * 100,
+        h2_share=st.Hydrogen_In.cost * hrs / 1e6 / toc * 100,
+        fixed_share=tea.FOC / 1e6 / toc * 100,
+        util_share=sys_.utility_cost / 1e6 / toc * 100,
+        storage=gp['storage'] / (tic * 1e6) * 100,
+        upgrading=gp['upgrading'] / (tic * 1e6) * 100,
+        fract=gp['fract'] / (tic * 1e6) * 100,
+        bt=0.0, wwt=0.0,
+        eth_per_gal=st.Ethanol_In.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
+        RN_rev_per_gal=st.RN.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
+        RD_rev_per_gal=st.RD.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
+    )
     return row
 
 rows = [run_case('A: US inputs + ASF selectivity', False), run_case('B: US inputs + paper split', True)]
