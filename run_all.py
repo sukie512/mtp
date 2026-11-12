@@ -1,6 +1,6 @@
 """
 run_all.py  --  RUN THIS FILE.  It calls the model files, prints every result table in the terminal,
-saves every chart as PNG and PDF in the selected output folder (default: ./prefinal_results1/) and (unless --no-show) opens charts at the end.
+saves every chart as PNG and PDF in the selected output folder (default: ./final_results/) and (unless --no-show) opens charts at the end.
 
     python run_all.py              # 3000 Latin-hypercube samples (full analysis)
     python run_all.py --n 3000    # explicitly set the Monte Carlo sample count
@@ -20,7 +20,8 @@ ap.add_argument('--n', type=int, default=3000, help='Number of Latin-hypercube s
 ap.add_argument('--seed', type=int, default=1234, help='Random seed for reproducible sampling (default: 1234)')
 ap.add_argument('--no-show', action='store_true')
 ap.add_argument('--quick', action='store_true')
-ap.add_argument('--out', default='prefinal_results1', help='Output folder for tables and plots (default: prefinal_results1)')
+ap.add_argument('--out', default='final_results', help='Output folder for tables and plots (default: final_results)')
+ ap.add_argument('--skip-validation', action='store_true', help='Skip the reference-paper comparison stage')
 args = ap.parse_args()
 if not args.quick and args.n < 2:
     ap.error('--n must be at least 2 for a Monte Carlo run')
@@ -343,6 +344,18 @@ if SWEEP_FAILURES:
 else:
     print("\nAll deterministic sweep points completed without fallback failures.")
 
+# Run the reference-paper comparison into the same output folder. This is a
+# separate US-basis comparison, not the India baseline or experimental validation.
+validation_status = 'skipped'
+if not args.skip_validation:
+    head('10. REFERENCE-PAPER COMPARISON')
+    validation_script = os.path.join(HERE, 'validate_paper.py')
+    subprocess.run(
+        [sys.executable, validation_script, '--out', OUT],
+        cwd=HERE, check=True
+    )
+    validation_status = 'completed'
+
 # Save enough run metadata to make a result folder interpretable later.
 try:
     git_revision = subprocess.run(
@@ -368,6 +381,7 @@ manifest = {
     'quick_mode': bool(args.quick),
     'monte_carlo_samples_requested': 0 if args.quick else args.n,
     'monte_carlo_seed': None if args.quick else args.seed,
+    'reference_paper_comparison': validation_status,
     'output_directory': os.path.abspath(OUT),
     'git_revision': git_revision,
     'python_version': platform.python_version(),
