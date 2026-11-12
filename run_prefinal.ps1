@@ -18,4 +18,4 @@ Invoke-Checked "Run supplementary H2-storage and ATF price-parity screens" "pyth
 Invoke-Checked "Run ethanol-price basis audit (1G reference vs 2G cost cases)" "python" @("ethanol_price_basis_audit.py", "--out", "final_results/ethanol_price_basis_audit.csv")
 Invoke-Checked "Run three independent 1,000-sample LHS replicates" "python" @("run_mc_replicates.py", "--n", "1000", "--replicates", "3", "--seed", "1234", "--out", "final_results/replicates")
 
-Write-Host "`nPrefinal workflow completed. Review final_results/VALIDATION_CHECKLIST.md and every failure/convergence diagnostic before using the outputs." -ForegroundColor Green
+Write-Host "`nFull workflow completed. Review final_results/VALIDATION_CHECKLIST.md and every failure/convergence diagnostic before using the outputs." -ForegroundColor Green
