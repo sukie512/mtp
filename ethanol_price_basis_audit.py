@@ -6,7 +6,7 @@ the feedstock contribution and full TEA MJSP can be compared on a consistent bas
 
 Examples:
     python ethanol_price_basis_audit.py
-    python ethanol_price_basis_audit.py --out prefinal_results/price_basis_audit.csv
+    python ethanol_price_basis_audit.py --out final_results/price_basis_audit.csv
 """
 import argparse
 from pathlib import Path
@@ -51,7 +51,7 @@ def run_price_case(label, route, ethanol_price, basis_note):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out", default="prefinal_results/ethanol_price_basis_audit.csv")
+    parser.add_argument("--out", default="final_results/ethanol_price_basis_audit.csv")
     args = parser.parse_args()
 
     rows = []
