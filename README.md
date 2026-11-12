@@ -85,7 +85,7 @@ python run_all.py --n 3000 --seed 1234 --no-show
 
 This runs the baseline, cost breakdown, ASF analysis, ethanol-route comparison, hydrogen-route comparison, plant-scale sweep, temperature-pressure sweep, catalyst-deactivation sweep, and Monte Carlo analysis with 3,000 Latin-hypercube samples. --no-show saves the figures without opening plot windows.
 
-The default output directory is prefinal_results1/. It is created automatically. Existing results/ files are not overwritten by the default run.
+The default output directory is final_results/. It is created automatically. The full runner also executes the reference-paper comparison and saves validation_vs_paper.csv, validation_vs_paper.png and validation_vs_paper.pdf there. Existing results/ files are not overwritten by the default run.
 
 ### Quick deterministic run
 
@@ -111,7 +111,7 @@ A reported SAF selling-price target of INR 180–200/L from an Indian ATJ develo
 Run the reconciliation cases:
 
 ```powershell
-python ethanol_price_basis_audit.py --out prefinal_results1/ethanol_price_basis_audit.csv
+python ethanol_price_basis_audit.py --out final_results/ethanol_price_basis_audit.csv
 ```
 
 The audit compares a 1G cane-juice administered-price reference (INR 65.61/L), a provisional 2G production-cost estimate (INR 120/L), and the older high-cost 2G estimate (INR 160/L). It reports the ethanol feed cost, hydrogen cost, naphtha/diesel credits, annual operating-cost contributions and simulated ethanol-to-SAF volume ratio per litre of SAF. The 1G row is a comparison case only, not the thesis baseline.
@@ -123,7 +123,7 @@ The default 2G cost was refreshed from INR 160/L to INR 120/L using 2026 industr
 Run the hydrogen-storage capital sensitivity and an indicative SAF-vs-fossil-ATF price-parity screen:
 
 ```powershell
-python additional_sensitivities.py --out prefinal_results1
+python additional_sensitivities.py --out final_results
 ```
 
 The storage sweep tests 1, 3, 7, 14 and 30 days and reports hydrogen tank installed cost, total installed equipment cost, FCI and MJSP. Storage duration changes tank sizing/capital in the current model; it does not simulate dynamic inventory operation or supply interruptions.
@@ -135,7 +135,7 @@ The price-parity screen compares the deterministic SAF MJSP with the configured 
 The prefix-based diagnostic above uses subsets of one LHS design. For a stronger check, run multiple independent designs with distinct seeds:
 
 ```bash
-python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out prefinal_results1/replicates
+python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out final_results/replicates
 ```
 
 This performs three fresh 1,000-sample runs with distinct seeds. It excludes NaN and both positive/negative infinity from the valid MJSP distribution, saves non-finite rows separately for each replicate, and writes:
@@ -150,7 +150,7 @@ Compare both the MJSP quantiles and sensitivity rankings. Stable percentiles wit
 
 ## Outputs
 
-The runner writes files under prefinal_results1/ by default:
+The runner writes files under final_results/ by default:
 
 - PNG and PDF versions of the generated figures
 - CSV tables for deterministic route, scale, temperature-pressure and deactivation sweeps, plus `sweep_failures.csv` with solver exceptions and non-finite points that were retried individually
@@ -203,4 +203,4 @@ These tests cover ASF distribution normalization, the oligomer-product basis, th
 10. **Independent validation:** complete carbon, hydrogen and oxygen balances, stream mass balances, energy-duty checks, unit checks and selected comparisons against literature or independently calculated values.
 10. **Runtime status:** a successful BioSTEAM simulation is not, by itself, process validation. Do not report new numerical results as verified until the current branch has been run locally and its logs, warnings, convergence and balances have been reviewed.
 
-For the complete issue-by-issue checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md) and [prefinal validation register](prefinal_results1/VALIDATION_CHECKLIST.md).
+For the complete issue-by-issue checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md) and [prefinal validation register](final_results/VALIDATION_CHECKLIST.md).
