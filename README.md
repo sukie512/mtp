@@ -203,4 +203,4 @@ These tests cover ASF distribution normalization, the oligomer-product basis, th
 10. **Independent validation:** complete carbon, hydrogen and oxygen balances, stream mass balances, energy-duty checks, unit checks and selected comparisons against literature or independently calculated values.
 10. **Runtime status:** a successful BioSTEAM simulation is not, by itself, process validation. Do not report new numerical results as verified until the current branch has been run locally and its logs, warnings, convergence and balances have been reviewed.
 
-For the complete issue-by-issue checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md) and [prefinal validation register](final_results/VALIDATION_CHECKLIST.md).
+For the issue-by-issue model limitations and review checklist, see [MODEL_REVIEW_AND_PLOT_GUIDE.md](MODEL_REVIEW_AND_PLOT_GUIDE.md).
