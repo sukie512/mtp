@@ -20,7 +20,8 @@ ap.add_argument('--n', type=int, default=3000, help='Number of Latin-hypercube s
 ap.add_argument('--seed', type=int, default=1234, help='Random seed for reproducible sampling (default: 1234)')
 ap.add_argument('--no-show', action='store_true')
 ap.add_argument('--quick', action='store_true')
-ap.add_argument('--out', default='prefinal_results1', help='Output folder for tables and plots (default: prefinal_results1)')
+ap.add_argument('--out', default='final_results', help='Output folder for all tables, plots and run metadata (default: final_results)')
+ap.add_argument('--skip-validation', action='store_true', help='Skip the reference-paper comparison (not recommended for final runs)')
 args = ap.parse_args()
 if not args.quick and args.n < 2:
     ap.error('--n must be at least 2 for a Monte Carlo run')
@@ -342,6 +343,19 @@ if SWEEP_FAILURES:
     print(f"\nWARNING: {len(SWEEP_FAILURES)} sweep failure record(s) saved to sweep_failures.csv")
 else:
     print("\nAll deterministic sweep points completed without fallback failures.")
+
+# ------------------------------------------------------------------ 10 reference-paper comparison
+if not args.skip_validation:
+    head('10. REFERENCE-PAPER COMPARISON')
+    validation_script = os.path.join(HERE, 'validate_paper.py')
+    if not os.path.isfile(validation_script):
+        raise FileNotFoundError(f'Required validation script not found: {validation_script}')
+    validation_cmd = [sys.executable, validation_script, '--out', OUT]
+    print('Running reference-paper comparison and saving validation_vs_paper.csv/png in the run folder...', flush=True)
+    subprocess.run(validation_cmd, cwd=HERE, check=True)
+    print('Reference-paper comparison completed.', flush=True)
+else:
+    print('Reference-paper comparison skipped by --skip-validation.', flush=True)
 
 # Save enough run metadata to make a result folder interpretable later.
 try:
