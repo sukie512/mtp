@@ -36,7 +36,7 @@ def price_parity_screen(mjsp_inr_l, fossil_atf_inr_l):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out", default="prefinal_results1", help="Output directory")
+    parser.add_argument("--out", default="final_results", help="Output directory (default: final_results)")
     parser.add_argument(
         "--storage-days", type=float, nargs="+",
         default=[1, 3, 7, 14, 30],
