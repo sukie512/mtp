@@ -87,7 +87,7 @@ For the full uncertainty run:
 python run_all.py --n 3000 --seed 1234 --no-show
 ```
 
-The figures are written to `prefinal_results/` by default as high-resolution PNG and PDF files; tables are exported as CSV. Use `--out another_folder` to select a different output directory. The full Monte Carlo runtime depends on the machine and convergence behaviour.
+The figures are written to `final_results/` by default as high-resolution PNG and PDF files; tables are exported as CSV. The main runner also invokes `validate_paper.py` and writes `validation_vs_paper.csv`, `.png` and `.pdf` into the same folder. This is a reference-paper comparison on the paper's US input basis, not experimental validation. Use `--out another_folder` to select a different output directory. The full Monte Carlo runtime depends on the machine and convergence behaviour.
 
 ## Validation status
 
