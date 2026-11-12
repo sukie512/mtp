@@ -351,7 +351,7 @@ if not args.skip_validation:
     if not os.path.isfile(validation_script):
         raise FileNotFoundError(f'Required validation script not found: {validation_script}')
     validation_cmd = [sys.executable, validation_script, '--out', OUT]
-    print('Running reference-paper comparison and saving validation_vs_paper.csv/png in the run folder...', flush=True)
+    print('Running reference-paper comparison and saving validation_vs_paper.csv, .png and .pdf in the run folder...', flush=True)
     subprocess.run(validation_cmd, cwd=HERE, check=True)
     print('Reference-paper comparison completed.', flush=True)
 else:
@@ -389,6 +389,7 @@ manifest = {
     'package_versions': package_versions,
     'model_inputs': s_,
     'monte_carlo_summary': mc_summary,
+    'reference_paper_comparison': 'skipped' if args.skip_validation else 'completed',
     'baseline': {
         'ethanol_route': s_['ethanol_route'],
         'hydrogen_route': s_['h2_route'],
