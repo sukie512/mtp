@@ -1,6 +1,6 @@
 """
 validate_paper.py -- VALIDATION: run YOUR model with the PAPER's US inputs and compare with the paper's reported numbers.
-Run in the same folder as your model files:   python validate_paper.py   (about 1 minute)
+Run from the repository root: python validate_paper.py [--out final_results]
 
 Paper = Wadgama & Shi 2026, Sustain. Sci. Technol. 3, 034002 (text + Fig. 2). Paper values used for comparison:
   MJSP 8.89 USD/gal ; ethanol contributes 6.41 USD/gal ; TIC 58.85 MM USD ; TOC 71.08 MM USD
@@ -43,11 +43,6 @@ def us_settings():
     s['income_tax'] = 0.21; s['finance_interest'] = 0.08; s['location_factor'] = 1.0
     s['labor_USD_yr'] = 2.5e6                                           # paper-style US labour (my earlier note; check repo etj labor cells)
     return s
-
-def paper_split(alpha, kmax=60):
-    """Fixed split of the paper's repo, mapped onto our chain lengths: C4 .20, C6 .15, C10 .62, C18 .03."""
-    w = np.zeros(kmax); w[1], w[2], w[4], w[8] = 0.20, 0.15, 0.62, 0.03
-    return w
 
 def groups(F):
     g = {'storage': ['T101', 'T102', 'T501', 'T502', 'T503'],
@@ -103,14 +98,14 @@ print(df.round(2).to_string())
 for c in df.columns[:2]:
     gap = (df.loc['MJSP', c] - PAPER['MJSP']) / PAPER['MJSP'] * 100
     print(f"\n>>> {c}: MJSP {df.loc['MJSP', c]:.2f} vs paper 8.89 USD/gal  ->  gap {gap:+.1f} %")
-print('\nHow to read: gap < ~10 %  = model reproduces the paper; larger gaps are explained by what your flowsheet omits')
+print('\nThis is a reference-case comparison, not independent process validation; gaps should be interpreted against differences in flowsheet scope and assumptions.')
 print('(boiler/turbogenerator = 33.6 % of paper capex and a 0.36 USD/gal electricity credit; wastewater plant = 6.6 %)')
 df.round(3).to_csv(os.path.join(OUT, 'validation_vs_paper.csv'))
 fig, ax = plt.subplots(1, 3, figsize=(16, 4.6)); cs = ['#2a9d8f', '#457b9d', '#e76f51']
 cols = list(df.columns)
 ax[0].bar(range(3), [df.loc['MJSP', c] for c in cols], color=cs); ax[0].set_xticks(range(3)); ax[0].set_xticklabels(['A: ASF', 'B: paper split', 'PAPER'], rotation=10)
 for i, c in enumerate(cols): ax[0].text(i, df.loc['MJSP', c] + .1, f"{df.loc['MJSP', c]:.2f}", ha='center')
-ax[0].set_ylabel('MJSP [USD/gal]'); ax[0].set_title('Does the model reproduce 8.89 USD/gal?')
+ax[0].set_ylabel('MJSP [USD/gal]'); ax[0].set_title('Reference-case MJSP comparison')
 for j, (key, lab) in enumerate([('storage', 'Storage'), ('upgrading', 'Catalytic upgrading'), ('fract', 'Fractionation'), ('bt', 'Boiler/turbogen'), ('wwt', 'Wastewater')]):
     for i, c in enumerate(cols): ax[1].bar(j + (i - 1) * 0.27, df.loc[key, c], 0.27, color=cs[i], label=['A: ASF', 'B: paper split', 'PAPER'][i] if j == 0 else None)
 ax[1].set_xticks(range(5)); ax[1].set_xticklabels(['Storage', 'Upgrading', 'Fract.', 'Boiler', 'WWT'], rotation=15); ax[1].set_ylabel('% of installed capital'); ax[1].set_title('Capital split (BT, WWT not modelled)'); ax[1].legend()
