@@ -51,7 +51,7 @@ def run_price_case(label, route, ethanol_price, basis_note):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--out", default="prefinal_results/ethanol_price_basis_audit.csv")
+    parser.add_argument("--out", default="final_results/ethanol_price_basis_audit.csv")
     args = parser.parse_args()
 
     rows = []
