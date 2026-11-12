@@ -12,12 +12,19 @@ Three runs are compared so you can see WHICH modelling choice causes each gap:
   A  = your India-built model, but with US inputs, ASF selectivity (your new model)
   B  = same, but with the paper's FIXED product split (C4 20 / C6 15 / C10 62 / C18 3 wt%, from the repo's etj_settings.py)
 """
-import os, sys, warnings
+import argparse, os, sys, warnings
 warnings.filterwarnings('ignore')
+import matplotlib
+matplotlib.use('Agg')
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
-import numpy as np, pandas as pd, matplotlib
+parser = argparse.ArgumentParser(description='Compare the model against the reference paper on the paper input basis.')
+parser.add_argument('--out', default='final_results', help='Output directory for validation CSV and figures (default: final_results)')
+args = parser.parse_args()
+OUT = os.path.abspath(args.out)
+os.makedirs(OUT, exist_ok=True)
+import numpy as np, pandas as pd
 import matplotlib.pyplot as plt
-import settings as cfg, analysis as A, units, system as SYS
+import settings as cfg, analysis as A, system as SYS
 
 PAPER = dict(MJSP=8.89, TIC=58.85, TOC=71.08, eth_share=75.5, h2_share=11.2, fixed_share=10.5, util_share=2.8,
              storage=39.5, bt=33.6, upgrading=17.6, wwt=6.6, fract=2.7)
@@ -37,11 +44,6 @@ def us_settings():
     s['labor_USD_yr'] = 2.5e6                                           # paper-style US labour (my earlier note; check repo etj labor cells)
     return s
 
-def paper_split(alpha, kmax=60):
-    """Fixed split of the paper's repo, mapped onto our chain lengths: C4 .20, C6 .15, C10 .62, C18 .03."""
-    w = np.zeros(kmax); w[1], w[2], w[4], w[8] = 0.20, 0.15, 0.62, 0.03
-    return w
-
 def groups(F):
     g = {'storage': ['T101', 'T102', 'T501', 'T502', 'T503'],
          'upgrading': ['P201','H201','M201','H202','R201','S201','T201','K201','D201','K202','D202','H203','M202','R202','S202',
@@ -50,33 +52,41 @@ def groups(F):
     return {k: sum(getattr(F.unit, u).installed_cost for u in v if hasattr(F.unit, u)) for k, v in g.items()}
 
 def run_case(label, fixed_split):
-    # ASFOligomerizer imports and calls oligomer_weight_fractions directly.
-    # Patch that exact symbol; patching units.weight_fractions creates an unused
-    # attribute and the reference-split case otherwise fails to affect the reactor.
-    orig = units.oligomer_weight_fractions
-    units.oligomer_weight_fractions = paper_split if fixed_split else orig
-    try:
-        s = us_settings()
-        sys_, tea, F = SYS.build(s, ID='val_' + label[0])      # build, then relax the column check (trace ethanol with the fixed split)
-        for u in ('D201', 'D202', 'D301', 'D302'):
-            getattr(F.unit, u).check_LHK = False
-        if fixed_split:                                          # paper's slate has no C8/C12-C16: cut between the lumps it actually has
-            F.unit.D301.LHK = ('Hexane', 'Decane'); F.unit.D302.LHK = ('Decane', 'Octadecane')
-        sys_.simulate()
-        tea.depreciation = 'MACRS7'                                     # paper: MACRS 7-yr, not Indian WDV
-        r = A.results(sys_, tea, F, s)
-        hrs = tea.operating_hours; st = F.stream
-        toc = (tea.VOC + tea.FOC) / 1e6; tic = tea.installed_equipment_cost / 1e6; gp = groups(F); gsum = sum(gp.values())
-        row = dict(case=label, MJSP=r['MJSP_USD_gal'], SAF_MMgal=r['SAF_MMgal_yr'], TIC=tic, TOC=toc,
-                   eth_share=st.Ethanol_In.cost * hrs / 1e6 / toc * 100, h2_share=st.Hydrogen_In.cost * hrs / 1e6 / toc * 100,
-                   fixed_share=tea.FOC / 1e6 / toc * 100, util_share=sys_.utility_cost / 1e6 / toc * 100,
-                   storage=gp['storage'] / (tic * 1e6) * 100, upgrading=gp['upgrading'] / (tic * 1e6) * 100,
-                   fract=gp['fract'] / (tic * 1e6) * 100, bt=0.0, wwt=0.0,
-                   eth_per_gal=st.Ethanol_In.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
-                   RN_rev_per_gal=st.RN.cost * hrs / (st.SAF.F_vol * 264.172 * hrs), RD_rev_per_gal=st.RD.cost * hrs / (st.SAF.F_vol * 264.172 * hrs))
-        return row
-    finally:
-        units.oligomer_weight_fractions = orig
+    s = us_settings()
+    # Use the selectivity mode supported by ASFOligomerizer. This changes the
+    # reactor's actual product split; monkey-patching a helper is unnecessary.
+    s['olig']['mode'] = 'fixed_literature' if fixed_split else 'asf'
+    sys_, tea, F = SYS.build(s, ID='val_' + label[0])
+    for u in ('D201', 'D202', 'D301', 'D302'):
+        getattr(F.unit, u).check_LHK = False
+    if fixed_split:
+        # The fixed literature slate contains C4, C6, C10 and C18+ only.
+        F.unit.D301.LHK = ('Hexane', 'Decane')
+        F.unit.D302.LHK = ('Decane', 'Octadecane')
+    sys_.simulate()
+    tea.depreciation = 'MACRS7'
+    r = A.results(sys_, tea, F, s)
+    hrs = tea.operating_hours
+    st = F.stream
+    toc = (tea.VOC + tea.FOC) / 1e6
+    tic = tea.installed_equipment_cost / 1e6
+    gp = groups(F)
+    row = dict(
+        case=label, MJSP=r['MJSP_USD_gal'], SAF_MMgal=r['SAF_MMgal_yr'],
+        TIC=tic, TOC=toc,
+        eth_share=st.Ethanol_In.cost * hrs / 1e6 / toc * 100,
+        h2_share=st.Hydrogen_In.cost * hrs / 1e6 / toc * 100,
+        fixed_share=tea.FOC / 1e6 / toc * 100,
+        util_share=sys_.utility_cost / 1e6 / toc * 100,
+        storage=gp['storage'] / (tic * 1e6) * 100,
+        upgrading=gp['upgrading'] / (tic * 1e6) * 100,
+        fract=gp['fract'] / (tic * 1e6) * 100,
+        bt=0.0, wwt=0.0,
+        eth_per_gal=st.Ethanol_In.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
+        RN_rev_per_gal=st.RN.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
+        RD_rev_per_gal=st.RD.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
+    )
+    return row
 
 rows = [run_case('A: US inputs + ASF selectivity', False), run_case('B: US inputs + paper split', True)]
 df = pd.DataFrame(rows).set_index('case').T
@@ -89,8 +99,7 @@ for c in df.columns[:2]:
     print(f"\n>>> {c}: MJSP {df.loc['MJSP', c]:.2f} vs paper 8.89 USD/gal  ->  gap {gap:+.1f} %")
 print('\nHow to read: gap < ~10 %  = model reproduces the paper; larger gaps are explained by what your flowsheet omits')
 print('(boiler/turbogenerator = 33.6 % of paper capex and a 0.36 USD/gal electricity credit; wastewater plant = 6.6 %)')
-os.makedirs(os.path.join(HERE, 'results'), exist_ok=True)
-df.round(3).to_csv(os.path.join(HERE, 'results', 'validation_vs_paper.csv'))
+df.round(3).to_csv(os.path.join(OUT, 'validation_vs_paper.csv'))
 fig, ax = plt.subplots(1, 3, figsize=(16, 4.6)); cs = ['#2a9d8f', '#457b9d', '#e76f51']
 cols = list(df.columns)
 ax[0].bar(range(3), [df.loc['MJSP', c] for c in cols], color=cs); ax[0].set_xticks(range(3)); ax[0].set_xticklabels(['A: ASF', 'B: paper split', 'PAPER'], rotation=10)
@@ -102,5 +111,8 @@ ax[1].set_xticks(range(5)); ax[1].set_xticklabels(['Storage', 'Upgrading', 'Frac
 for j, (key, lab) in enumerate([('eth_share', 'Ethanol'), ('h2_share', 'Hydrogen'), ('fixed_share', 'Fixed op.'), ('util_share', 'Utilities')]):
     for i, c in enumerate(cols): ax[2].bar(j + (i - 1) * 0.27, df.loc[key, c], 0.27, color=cs[i])
 ax[2].set_xticks(range(4)); ax[2].set_xticklabels(['Ethanol', 'Hydrogen', 'Fixed', 'Utilities']); ax[2].set_ylabel('% of operating cost'); ax[2].set_title('Operating-cost split')
-plt.tight_layout(); fig.savefig(os.path.join(HERE, 'results', 'validation_vs_paper.png'), bbox_inches='tight', dpi=150)
-print('\n[saved results/validation_vs_paper.csv and results/validation_vs_paper.png]')
+plt.tight_layout()
+fig.savefig(os.path.join(OUT, 'validation_vs_paper.png'), bbox_inches='tight', dpi=300)
+fig.savefig(os.path.join(OUT, 'validation_vs_paper.pdf'), format='pdf', bbox_inches='tight')
+plt.close(fig)
+print(f'\n[saved validation_vs_paper.csv, validation_vs_paper.png and validation_vs_paper.pdf in {OUT}]')
