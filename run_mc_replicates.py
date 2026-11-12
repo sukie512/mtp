@@ -1,7 +1,7 @@
 """Run independent Latin-hypercube replicates and compare uncertainty stability.
 
 Example:
-    python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out prefinal_results1/replicates
+    python run_mc_replicates.py --n 1000 --replicates 3 --seed 1234 --out final_results/replicates
 
 Each replicate builds a fresh model and uses a distinct deterministic seed. This
 is separate from run_all.py's prefix diagnostic: independent designs are the
@@ -67,7 +67,7 @@ def main():
     parser.add_argument("--n", type=int, default=1000, help="LHS samples per independent replicate")
     parser.add_argument("--replicates", type=int, default=3, help="Number of independent LHS designs")
     parser.add_argument("--seed", type=int, default=1234, help="Seed for the first replicate")
-    parser.add_argument("--out", default="prefinal_results1/replicates", help="Directory for replicate summaries and samples")
+    parser.add_argument("--out", default="final_results/replicates", help="Directory for replicate summaries and samples")
     args = parser.parse_args()
 
     if args.n < 2:
