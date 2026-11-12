@@ -1,0 +1,17 @@
+,A: US inputs + ASF selectivity,B: US inputs + paper split,PAPER
+MJSP,10.091,9.425,8.89
+SAF_MMgal,6.555,8.309,9.0
+TIC,50.293,52.64,58.85
+TOC,74.714,75.268,71.08
+eth_share,71.287,70.763,75.5
+h2_share,9.172,10.482,11.2
+fixed_share,11.04,11.176,10.5
+util_share,5.911,5.078,2.8
+storage,71.982,77.039,39.5
+upgrading,21.246,20.164,17.6
+fract,6.772,2.797,2.7
+bt,0.0,0.0,33.6
+wwt,0.0,0.0,6.6
+eth_per_gal,8.125,6.41,6.41
+RN_rev_per_gal,1.132,1.011,1.01
+RD_rev_per_gal,2.035,0.156,0.16
