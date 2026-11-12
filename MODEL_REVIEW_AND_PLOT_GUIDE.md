@@ -104,7 +104,7 @@ The script `additional_sensitivities.py` adds two small analyses outside the mai
 Run from the repository root:
 
 ```powershell
-python additional_sensitivities.py --out prefinal_results
+python additional_sensitivities.py --out final_results
 ```
 
 The pressure-coupling test already exists and confirms that K202, D202 and R202 move together. It should not be re-implemented.
