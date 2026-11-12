@@ -18,7 +18,7 @@ HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, HERE)
 import numpy as np, pandas as pd, matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import settings as cfg, analysis as A, units, system as SYS
+import settings as cfg, analysis as A, system as SYS
 
 parser = argparse.ArgumentParser(description='Compare the model against the Wadgama & Shi (2026) reference case.')
 parser.add_argument('--out', default='final_results', help='Directory for validation CSV and figures (default: final_results)')
@@ -57,11 +57,12 @@ def groups(F):
     return {k: sum(getattr(F.unit, u).installed_cost for u in v if hasattr(F.unit, u)) for k, v in g.items()}
 
 def run_case(label, fixed_split):
-    orig = units.oligomer_weight_fractions
-    units.oligomer_weight_fractions = paper_split if fixed_split else orig
-    try:
-        s = us_settings()
-        sys_, tea, F = SYS.build(s, ID='val_' + label[0])      # build, then relax the column check (trace ethanol with the fixed split)
+    s = us_settings()
+    if fixed_split:
+        # Use the model's native fixed-literature mode rather than monkey-patching
+        # an ASF helper that is no longer part of the unit-operation API.
+        s['olig']['mode'] = 'fixed_literature'
+    sys_, tea, F = SYS.build(s, ID='val_' + label[0])      # build, then relax the column check (trace ethanol with the fixed split)
         for u in ('D201', 'D202', 'D301', 'D302'):
             getattr(F.unit, u).check_LHK = False
         if fixed_split:                                          # paper's slate has no C8/C12-C16: cut between the lumps it actually has
@@ -78,9 +79,7 @@ def run_case(label, fixed_split):
                    fract=gp['fract'] / (tic * 1e6) * 100, bt=0.0, wwt=0.0,
                    eth_per_gal=st.Ethanol_In.cost * hrs / (st.SAF.F_vol * 264.172 * hrs),
                    RN_rev_per_gal=st.RN.cost * hrs / (st.SAF.F_vol * 264.172 * hrs), RD_rev_per_gal=st.RD.cost * hrs / (st.SAF.F_vol * 264.172 * hrs))
-        return row
-    finally:
-        units.oligomer_weight_fractions = orig
+    return row
 
 rows = [run_case('A: US inputs + ASF selectivity', False), run_case('B: US inputs + paper split', True)]
 df = pd.DataFrame(rows).set_index('case').T
